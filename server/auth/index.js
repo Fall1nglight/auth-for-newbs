@@ -1,8 +1,10 @@
 const express = require('express');
 const Joi = require('joi');
+const bcryptjs = require('bcryptjs');
 
-const db = require('./db/connection');
+const db = require('../db/connection');
 const users = db.get('users');
+users.createIndex('username', { unique: true });
 
 const router = express.Router();
 
@@ -22,12 +24,24 @@ router.get('/', (req, res) => {
   });
 });
 
-router.post('/signup', async (req, res) => {
+// ? Használjuk a value objektumot vagy legyen üres await function?
+
+router.post('/signup', async (req, res, next) => {
   try {
-    const value = await schema.validateAsync(req.body);
-    console.log(value);
+    const verifiedUser = await schema.validateAsync(req.body);
+
+    const user = await users.findOne({ username: verifiedUser.username });
+
+    // * Need to hash the password
+
+    /*     if (!user) {
+      const insertedUser = await users.insert({ verifiedUser });
+    }
+ */
+    new Error('A felhasználónév foglalt. Kérlek válassz egy újat.');
   } catch (error) {
-    console.log(error.message || error);
+    // console.log(error.message || error);
+    next(error);
   }
 });
 
