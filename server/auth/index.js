@@ -32,8 +32,8 @@ router.post('/signup', async (req, res, next) => {
 
     const user = await users.findOne({ username: verifiedUser.username });
 
-    // * Need to hash the password
-    // ! mongodbcompass
+    // TODO meg kell nézni, hogy működik-e a joi.trim()
+    // * mongoDB compass laptopon
 
     if (!user) {
       const hashedPassword = await bcrypt.hash(verifiedUser.password, 12);
@@ -42,7 +42,8 @@ router.post('/signup', async (req, res, next) => {
         password: hashedPassword,
       });
 
-      res.json(newUser);
+      delete newUser.password;
+      return res.json(newUser);
     }
 
     throw new Error('A felhasználónév foglalt. Kérlek válassz egy újat.');
