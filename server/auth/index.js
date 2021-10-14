@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const bcryptjs = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 
 const db = require('../db/connection');
 const users = db.get('users');
@@ -33,14 +33,20 @@ router.post('/signup', async (req, res, next) => {
     const user = await users.findOne({ username: verifiedUser.username });
 
     // * Need to hash the password
+    // ! mongodbcompass
 
-    /*     if (!user) {
-      const insertedUser = await users.insert({ verifiedUser });
+    if (!user) {
+      const hashedPassword = await bcrypt.hash(verifiedUser.password, 12);
+      const newUser = await users.insert({
+        ...verifiedUser,
+        password: hashedPassword,
+      });
+
+      res.json(newUser);
     }
- */
-    new Error('A felhasználónév foglalt. Kérlek válassz egy újat.');
+
+    throw new Error('A felhasználónév foglalt. Kérlek válassz egy újat.');
   } catch (error) {
-    // console.log(error.message || error);
     next(error);
   }
 });
