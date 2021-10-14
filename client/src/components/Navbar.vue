@@ -1,9 +1,11 @@
 <template>
-  <h1>Home</h1>
+  <h1>Navbar</h1>
 </template>
 
 <script>
 export default {
-  name: 'Home',
+  name: 'Navbar',
 };
 </script>
+
+<style></style>
