@@ -15,7 +15,7 @@ const schema = Joi.object({
     .max(30)
     .required(),
 
-  password: Joi.string().trim().min(10).max(30).required(),
+  password: Joi.string().regex(/^\S+$/).min(10).max(30).required(),
 });
 
 router.get('/', (req, res) => {
@@ -48,6 +48,7 @@ router.post('/signup', async (req, res, next) => {
 
     throw new Error('A felhasználónév foglalt. Kérlek válassz egy újat.');
   } catch (error) {
+    res.status(422);
     next(error);
   }
 });

@@ -1,5 +1,5 @@
 const express = require('express');
-const morgan = require('morgan');
+const helmet = require('helmet');
 const cors = require('cors');
 const volleyball = require('volleyball');
 
@@ -8,6 +8,12 @@ const app = express();
 const auth = require('./auth');
 
 app.use(volleyball);
+app.use(
+  cors({
+    origin: 'http://localhost:8080',
+  })
+);
+app.use(helmet());
 app.use(express.json());
 
 app.get('/', (req, res) => {
