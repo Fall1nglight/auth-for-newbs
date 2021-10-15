@@ -4,7 +4,7 @@
 
 <script>
 // TODO: Valami kép, jobb design
-// TODO: App.vue-ba egy navbarStatus, hogy ki lehessen kapcsolni -> Fullscreen
+// TODO: App.vue-ba egy navbarStatusés footbarStatus, hogy ki lehessen kapcsolni -> Fullscreen
 
 export default {
   name: 'NotFoundPage',

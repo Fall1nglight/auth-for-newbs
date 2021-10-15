@@ -18,19 +18,15 @@
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
             <router-link to="/" class="nav-link active"
-              >Főoldal
-              <span class="visually-hidden">(jelenlegi)</span>
+              >Homepage
+              <span class="visually-hidden">(current)</span>
             </router-link>
           </li>
           <li class="nav-item">
-            <router-link to="/signup" class="nav-link"
-              >Regisztráció</router-link
-            >
+            <router-link to="/signup" class="nav-link">Signup</router-link>
           </li>
           <li class="nav-item">
-            <router-link to="/login" class="nav-link"
-              >Bejelentkezés</router-link
-            >
+            <router-link to="/login" class="nav-link">Login</router-link>
           </li>
         </ul>
       </div>
