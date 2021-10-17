@@ -69,6 +69,7 @@
 <script>
 import { ref } from '@vue/reactivity';
 import { watch } from '@vue/runtime-core';
+import { useRouter } from 'vue-router';
 import Joi from 'joi';
 
 import DisplayMessage from '../components/DisplayMessage';
@@ -102,6 +103,8 @@ export default {
   },
 
   setup() {
+    const router = useRouter();
+
     // refs
     const user = ref({
       username: '',
@@ -125,17 +128,13 @@ export default {
       errorMessage.value = '';
 
       if (await validUser()) {
-        // send data to the server
-
-        const body = {
-          username: user.value.username,
-          password: user.value.password,
-        };
-
         try {
           const response = await fetch(API_URl, {
             method: 'POST',
-            body: JSON.stringify(body),
+            body: JSON.stringify({
+              username: user.value.username,
+              password: user.value.password,
+            }),
             headers: {
               'Content-type': 'application/json',
             },
@@ -143,7 +142,8 @@ export default {
 
           const result = await response.json();
           if (!response.ok) throw new Error(result.message);
-          console.log(result);
+
+          router.push({ path: 'Login' });
         } catch (error) {
           setErrorMessage(error.message);
         }
@@ -169,6 +169,7 @@ export default {
       }
     };
 
+    // expose
     return { user, errorMessage, signup };
   },
 };

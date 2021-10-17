@@ -1,6 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const db = require('../db/connection');
 const users = db.get('users');
@@ -18,38 +19,85 @@ const schema = Joi.object({
   password: Joi.string().regex(/^\S+$/).min(10).max(30).required(),
 });
 
+// ! Remove this later
 router.get('/', (req, res) => {
   res.json({
     message: 'Hi Auth!',
   });
 });
 
-// ? Használjuk a value objektumot vagy legyen üres await function?
+// ! Improve with statusCode paramater
+const respondWithError422 = (res, next, error) => {
+  res.status(422);
+  next(error);
+};
+
+const throwError = (error) => {
+  throw new Error(error);
+};
 
 router.post('/signup', async (req, res, next) => {
   try {
-    const verifiedUser = await schema.validateAsync(req.body);
+    const {
+      body: sentUser,
+      body: { username, password },
+    } = req;
 
-    const user = await users.findOne({ username: verifiedUser.username });
+    await schema.validateAsync(sentUser);
 
-    // TODO meg kell nézni, hogy működik-e a joi.trim()
-    // * mongoDB compass laptopon
+    const user = await users.findOne({ username: username });
 
-    if (!user) {
-      const hashedPassword = await bcrypt.hash(verifiedUser.password, 12);
-      const newUser = await users.insert({
-        ...verifiedUser,
-        password: hashedPassword,
-      });
+    if (user) throwError('Username is taken. Please choose another one.');
 
-      delete newUser.password;
-      return res.json(newUser);
-    }
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const newUser = await users.insert({
+      username: username,
+      password: hashedPassword,
+    });
 
-    throw new Error('A felhasználónév foglalt. Kérlek válassz egy újat.');
+    delete newUser.password;
+    return res.json(newUser);
   } catch (error) {
-    res.status(422);
-    next(error);
+    respondWithError422(res, next, error);
+  }
+});
+
+router.post('/login', async (req, res, next) => {
+  try {
+    const {
+      body: sentUser,
+      body: { username, password },
+    } = req;
+
+    await schema.validateAsync(sentUser);
+
+    const user = await users.findOne({ username: username });
+
+    if (!user) throwError('Invalid login credentials. Please try again.');
+
+    const correctPassword = await bcrypt.compare(password, user.password);
+
+    if (!correctPassword)
+      throwError('Invalid login credentials. Please try again.');
+
+    const payload = {
+      _id: user._id,
+      username: user.username,
+    };
+
+    jwt.sign(
+      payload,
+      process.env.TOKEN_SECRET,
+      {
+        expiresIn: '1h',
+      },
+      (error, token) => {
+        if (error) return respondWithError422(res, next, error);
+        res.json({ token });
+      }
+    );
+  } catch (error) {
+    respondWithError422(res, next, error);
   }
 });
 

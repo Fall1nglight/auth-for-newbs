@@ -2,10 +2,11 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const volleyball = require('volleyball');
+const auth = require('./auth');
+
+require('dotenv').config();
 
 const app = express();
-
-const auth = require('./auth');
 
 app.use(volleyball);
 app.use(
@@ -31,9 +32,11 @@ function notFound(req, res, next) {
 }
 
 function errorHandler(err, req, res, next) {
+  const errorMessage = err.message || 'Unknown error on the backend.';
+
   res.status(res.statusCode || 500);
   res.json({
-    message: err.message,
+    message: errorMessage,
     stack: err.stack,
   });
 }
