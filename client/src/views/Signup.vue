@@ -1,15 +1,15 @@
 <template>
   <form @submit.prevent="signup">
-    <div class="h1 mb-5 text-md-center">Signup</div>
+    <div class="h1 mb-5 text-center">Signup</div>
 
     <div class="row justify-content-md-center">
-      <div class="col-md-8">
+      <div class="col-md-10 col-lg-6">
         <DisplayMessage v-if="errorMessage" :message="errorMessage" />
       </div>
     </div>
 
     <div class="row mb-3 justify-content-md-center">
-      <div class="col-md-8">
+      <div class="col-md-10 col-lg-6">
         <label for="inputEmail" class="form-label">Username</label>
         <input
           v-model="user.username"
@@ -24,10 +24,8 @@
       </div>
     </div>
 
-    <!-- required -> input fields -->
-
     <div class="row mb-3 justify-content-md-center">
-      <div class="col-md-4 mb-3 mb-md-0">
+      <div class="col-md-5 col-lg-3 mb-3 mb-md-0">
         <label for="inputPassword" class="form-label">Password</label>
         <input
           v-model="user.password"
@@ -41,7 +39,7 @@
         />
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-5 col-lg-3">
         <label for="inputConfirmPassword" class="form-label"
           >Confirm Password</label
         >
@@ -59,7 +57,7 @@
     </div>
 
     <div class="row justify-content-md-center">
-      <div class="col-md-8 text-center text-md-start">
+      <div class="col-md-10 col-lg-6 text-center text-md-start">
         <button type="submit" class="btn btn-primary">Signup</button>
       </div>
     </div>
@@ -103,6 +101,7 @@ export default {
   },
 
   setup() {
+    // router
     const router = useRouter();
 
     // refs
@@ -143,7 +142,8 @@ export default {
           const result = await response.json();
           if (!response.ok) throw new Error(result.message);
 
-          router.push({ path: 'Login' });
+          localStorage.token = result.token;
+          router.push({ path: 'dashboard' });
         } catch (error) {
           setErrorMessage(error.message);
         }
@@ -170,7 +170,7 @@ export default {
     };
 
     // expose
-    return { user, errorMessage, signup };
+    return { user, signup, errorMessage };
   },
 };
 </script>

@@ -28,6 +28,12 @@
           <li class="nav-item">
             <router-link to="/login" class="nav-link">Login</router-link>
           </li>
+
+          <!-- todo: only show logout when the user is logged in -->
+
+          <li class="nav-item">
+            <router-link to="/logout" class="nav-link">Logout</router-link>
+          </li>
         </ul>
       </div>
     </div>

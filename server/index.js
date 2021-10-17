@@ -3,6 +3,8 @@ const helmet = require('helmet');
 const cors = require('cors');
 const volleyball = require('volleyball');
 const auth = require('./auth');
+const notes = require('./api/v1/notes');
+const middlewares = require('./auth/middlewares');
 
 require('dotenv').config();
 
@@ -16,6 +18,7 @@ app.use(
 );
 app.use(helmet());
 app.use(express.json());
+app.use(middlewares.checkTokenSetUser);
 
 app.get('/', (req, res) => {
   res.json({
@@ -24,14 +27,15 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', auth);
+app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
 
-function notFound(req, res, next) {
+const notFound = (req, res, next) => {
   res.status(404);
   const error = new Error(`Not Found ${req.originalUrl}`);
   next(error);
-}
+};
 
-function errorHandler(err, req, res, next) {
+const errorHandler = (err, req, res, next) => {
   const errorMessage = err.message || 'Unknown error on the backend.';
 
   res.status(res.statusCode || 500);
@@ -39,7 +43,7 @@ function errorHandler(err, req, res, next) {
     message: errorMessage,
     stack: err.stack,
   });
-}
+};
 
 app.use(notFound);
 app.use(errorHandler);

@@ -26,10 +26,26 @@ router.get('/', (req, res) => {
   });
 });
 
-// ! Improve with statusCode paramater
-const respondWithError422 = (res, next, error) => {
-  res.status(422);
+const respondWithError = (res, next, error, statusCode) => {
+  res.status(statusCode);
   next(error);
+};
+
+const createTokenSendResponse = (user, res, next) => {
+  const payload = {
+    _id: user._id,
+    username: user.username,
+  };
+
+  jwt.sign(
+    payload,
+    process.env.TOKEN_SECRET,
+    { expiresIn: '1h' },
+    (error, token) => {
+      if (error) return respondWithError(res, next, error, 422);
+      res.json({ token });
+    }
+  );
 };
 
 const throwError = (error) => {
@@ -46,7 +62,6 @@ router.post('/signup', async (req, res, next) => {
     await schema.validateAsync(sentUser);
 
     const user = await users.findOne({ username: username });
-
     if (user) throwError('Username is taken. Please choose another one.');
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -55,10 +70,9 @@ router.post('/signup', async (req, res, next) => {
       password: hashedPassword,
     });
 
-    delete newUser.password;
-    return res.json(newUser);
+    createTokenSendResponse(newUser, res, next);
   } catch (error) {
-    respondWithError422(res, next, error);
+    respondWithError(res, next, error, 422);
   }
 });
 
@@ -72,11 +86,9 @@ router.post('/login', async (req, res, next) => {
     await schema.validateAsync(sentUser);
 
     const user = await users.findOne({ username: username });
-
     if (!user) throwError('Invalid login credentials. Please try again.');
 
     const correctPassword = await bcrypt.compare(password, user.password);
-
     if (!correctPassword)
       throwError('Invalid login credentials. Please try again.');
 
@@ -85,20 +97,14 @@ router.post('/login', async (req, res, next) => {
       username: user.username,
     };
 
-    jwt.sign(
-      payload,
-      process.env.TOKEN_SECRET,
-      {
-        expiresIn: '1h',
-      },
-      (error, token) => {
-        if (error) return respondWithError422(res, next, error);
-        res.json({ token });
-      }
-    );
+    createTokenSendResponse(user, res, next);
   } catch (error) {
-    respondWithError422(res, next, error);
+    respondWithError(res, next, error, 422);
   }
+});
+
+router.get('/checkuser', (req, res, next) => {
+  res.json({ user: req.user });
 });
 
 module.exports = router;

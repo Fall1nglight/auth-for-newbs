@@ -1,8 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/Home.vue';
-import Signup from '../views/Signup.vue';
-import Login from '../views/Login.vue';
-import NotFoundPage from '../views/NotFoundPage.vue';
+import Home from '../views/Home';
+import Signup from '../views/Signup';
+import Login from '../views/Login';
+import Dashboard from '../views/Dashboard';
+import Logout from '../views/Logout';
+import NotFoundPage from '../views/NotFoundPage';
+
+const loggedInRedirectDashboard = (to, from, next) => {
+  if (localStorage.token) {
+    // ! validate the token
+
+    next('/dashboard');
+  } else {
+    next();
+  }
+};
+
+const isLoggedIn = (to, from, next) => {
+  // ! validate the token
+
+  if (!localStorage.token) return next('/login');
+  next();
+};
 
 const routes = [
   {
@@ -14,11 +33,25 @@ const routes = [
     path: '/signup',
     name: 'Signup',
     component: Signup,
+    beforeEnter: loggedInRedirectDashboard,
   },
   {
     path: '/login',
     name: 'Login',
     component: Login,
+    beforeEnter: loggedInRedirectDashboard,
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    beforeEnter: isLoggedIn,
+  },
+  {
+    path: '/logout',
+    name: 'Logout',
+    component: Logout,
+    beforeEnter: isLoggedIn,
   },
   {
     path: '/:pathMatch(.*)*',
