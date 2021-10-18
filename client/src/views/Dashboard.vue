@@ -1,25 +1,35 @@
 <template>
-  <div class="row justify-content-center">
+  <div class="row mb-3">
     <div class="col-md-5 me-auto">
       <div class="h1">Dashboard</div>
-      <!-- navbar display username -->
       <div class="h5">Welcome, {{ user.username }}</div>
     </div>
+  </div>
 
-    <div class="col-md-8">
-      <form @submit.prevent="insertNote"></form>
+  <div class="row">
+    <div class="col-md-5">
+      <div class="form-check form-switch">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="flexSwitchCheckDefault"
+          @click="toggleform = !toggleform"
+        />
+        <label class="form-check-label text-black" for="flexSwitchCheckDefault"
+          >Toggle form</label
+        >
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from '@vue/runtime-core';
+import { onMounted, ref, watch } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 import Joi from 'joi';
 
 const schema = Joi.object({
   title: Joi.string()
-    .regex(/(^[a-zA-Z0-9_]+$)/)
     .min(2)
     .max(30)
     .required(),
@@ -50,6 +60,8 @@ export default {
       title: '',
       note: '',
     });
+
+    const toggleForm = ref(false);
 
     const errorMessage = ref('');
 
@@ -86,6 +98,8 @@ export default {
       router.push({ path: 'login' });
     };
 
+    // todo: make a toggleForm fucntion
+
     const insertNote = async () => {
       if (await validNote()) {
         // insert note to the db
@@ -115,9 +129,10 @@ export default {
         return false;
       }
     };
+
     // watch
     // expose
-    return { user };
+    return { user, toggleForm };
   },
 };
 </script>

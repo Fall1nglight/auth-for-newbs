@@ -48,7 +48,6 @@ export default {
   setup() {
     //router
     const router = useRouter();
-    console.log(router.currentRoute.value);
   },
 };
 </script>
