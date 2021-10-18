@@ -10,6 +10,9 @@ require('dotenv').config();
 
 const app = express();
 
+// todo: when tokensecret error because no token was set
+// todo: do not insert user into db
+
 app.use(volleyball);
 app.use(
   cors({

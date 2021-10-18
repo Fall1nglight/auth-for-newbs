@@ -10,4 +10,11 @@ router.get('/', (req, res, next) => {
   res.json({ message: 'Hi' });
 });
 
+router.post('/', (req, res, next) => {
+  try {
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

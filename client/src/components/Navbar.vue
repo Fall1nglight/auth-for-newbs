@@ -41,8 +41,15 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
 export default {
   name: 'Navbar',
+
+  setup() {
+    //router
+    const router = useRouter();
+    console.log(router.currentRoute.value);
+  },
 };
 </script>
 
