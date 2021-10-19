@@ -4,7 +4,7 @@
 
     <div class="row justify-content-md-center">
       <div class="col-md-10 col-lg-6">
-        <DisplayMessage v-if="errorMessage" :message="errorMessage" />
+        <DisplayMessage :message="errorMessage" />
       </div>
     </div>
 
@@ -115,7 +115,7 @@ export default {
 
     // watch
     watch(user.value, () => {
-      errorMessage.value = '';
+      setErrorMessage('');
     });
 
     // functions

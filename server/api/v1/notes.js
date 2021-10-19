@@ -17,14 +17,13 @@ router.get('/', (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const {
-      body,
-      body: { title, newNote },
-    } = req;
+    const { body } = req;
 
     await schema.validateAsync(body);
 
-    console.log(req.body);
+    const newNote = await notes.insert({ ...body, user_id: req.user._id });
+
+    res.json({ newNote });
   } catch (error) {
     next(error);
   }

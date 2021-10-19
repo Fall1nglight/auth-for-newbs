@@ -1,6 +1,4 @@
 <template>
-  <DisplayMessage v-if="errorMessage" :message="errorMessage" />
-
   <div class="row mb-3 justify-content-evenly">
     <div class="col-md-5 text-black">
       <div class="h1">Dashboard</div>
@@ -17,6 +15,8 @@
     </div>
 
     <div class="col-md-5">
+      <DisplayMessage :message="errorMessage" />
+
       <div class="form-check form-switch">
         <input
           class="form-check-input"
@@ -112,35 +112,32 @@ export default {
 
     const errorMessage = ref('');
 
+    const message = ref({
+      message: '',
+      type: '',
+    });
+
     // todo: use bootstrap invisible instead of v-if
-    // todo: v-if inside error component
+    // todo: displayMessage ->
+    // todo: verify types, choose alert style accordingly
+    // todo: refactor changes in other components (login, signup)
 
     // hooks
     onMounted(async () => {
-      try {
-        const response = await fetch(`${API_URL}/auth/checkuser`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        if (!result.user) return logout();
-
-        // todo: refactor this
-        user.value._id = result.user._id;
-        user.value.exp = result.user.exp;
-        user.value.iat = result.user.iat;
-        user.value.username = result.user.username;
-      } catch (error) {
-        setErrorMessage(error.message);
-      }
+      await validateUser();
     });
 
     // functions
-    const setErrorMessage = (message) => {
-      errorMessage.value = message;
+    const setErrorMessage = (msg, msgType) => {
+      errorMessage.value = msg;
+
+      message.value.message = msg;
+      message.value.type = 'error';
+    };
+
+    const setMessage = (msg, msgType) => {
+      message.value.message = msg;
+      message.value.type = msgType;
     };
 
     const logout = () => {
@@ -152,7 +149,32 @@ export default {
       formVisibility.value = !formVisibility.value;
     };
 
+    const validateUser = async () => {
+      try {
+        const response = await fetch(`${API_URL}/auth/checkuser`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.token}`,
+          },
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+        if (!result.user) return logout();
+
+        // * set values 'manually' so we get corrections
+        // todo: refactor this
+
+        user.value._id = result.user._id;
+        user.value.exp = result.user.exp;
+        user.value.iat = result.user.iat;
+        user.value.username = result.user.username;
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
+    };
+
     const insertNote = async () => {
+      console.log(await validNote());
       if (await validNote()) {
         try {
           const response = await fetch(`${API_URL}/api/v1/notes`, {
@@ -167,7 +189,11 @@ export default {
           const result = await response.json();
           if (!response.ok) throw new Error(result.message);
 
-          console.log(result);
+          if (result.newNote) {
+          }
+
+          newNote.value.title = '';
+          newNote.value.note = '';
         } catch (error) {
           setErrorMessage(error.message);
         }
@@ -176,7 +202,7 @@ export default {
 
     const validNote = async () => {
       try {
-        await schema.validateAsync();
+        await schema.validateAsync(newNote.value);
         return true;
       } catch (error) {
         setErrorMessage(error.message);
@@ -185,8 +211,19 @@ export default {
     };
 
     // watch
+    watch(newNote.value, () => {
+      setErrorMessage('');
+    });
+
     // expose
-    return { user, newNote, formVisibility, toggleForm, insertNote };
+    return {
+      user,
+      newNote,
+      formVisibility,
+      errorMessage,
+      toggleForm,
+      insertNote,
+    };
   },
 };
 </script>
