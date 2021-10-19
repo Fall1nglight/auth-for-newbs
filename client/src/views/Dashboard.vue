@@ -1,23 +1,64 @@
 <template>
-  <div class="row mb-3">
-    <div class="col-md-5 me-auto">
+  <DisplayMessage v-if="errorMessage" :message="errorMessage" />
+
+  <div class="row mb-3 justify-content-evenly">
+    <div class="col-md-5 text-black">
       <div class="h1">Dashboard</div>
       <div class="h5">Welcome, {{ user.username }}</div>
-    </div>
-  </div>
 
-  <div class="row">
+      <figure class="mt-4">
+        <blockquote class="blockquote">
+          <p>A well-known quote, contained in a blockquote element.</p>
+        </blockquote>
+        <figcaption class="blockquote-footer text-black">
+          Someone famous in <cite title="Source Title">Source Title</cite>
+        </figcaption>
+      </figure>
+    </div>
+
     <div class="col-md-5">
       <div class="form-check form-switch">
         <input
           class="form-check-input"
           type="checkbox"
           id="flexSwitchCheckDefault"
-          @click="toggleform = !toggleform"
+          @click="toggleForm"
         />
         <label class="form-check-label text-black" for="flexSwitchCheckDefault"
           >Toggle form</label
         >
+      </div>
+
+      <div class="mt-3" v-if="formVisibility">
+        <form @submit.prevent="insertNote" class="text-black">
+          <div class="mb-3">
+            <label for="inputTitle" class="form-label">Note title</label>
+            <input
+              v-model="newNote.title"
+              type="text"
+              class="form-control"
+              id="inputTitle"
+              placeholder="Enter the title of your note."
+              aria-placeholder="Enter the title of your note."
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="inputNote" class="form-label">Note</label>
+            <textarea
+              v-model="newNote.note"
+              class="form-control"
+              id="inputNote"
+              placeholder="Enter your note."
+              aria-placeholder="Enter your note."
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -26,6 +67,9 @@
 <script>
 import { onMounted, ref, watch } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
+
+import DisplayMessage from '../components/DisplayMessage';
+
 import Joi from 'joi';
 
 const schema = Joi.object({
@@ -43,6 +87,9 @@ const API_URL = 'http://localhost:5000';
 
 export default {
   name: 'Dashboard',
+  components: {
+    DisplayMessage,
+  },
 
   setup() {
     // router
@@ -61,9 +108,12 @@ export default {
       note: '',
     });
 
-    const toggleForm = ref(false);
+    const formVisibility = ref(false);
 
     const errorMessage = ref('');
+
+    // todo: use bootstrap invisible instead of v-if
+    // todo: v-if inside error component
 
     // hooks
     onMounted(async () => {
@@ -98,25 +148,29 @@ export default {
       router.push({ path: 'login' });
     };
 
-    // todo: make a toggleForm fucntion
+    const toggleForm = () => {
+      formVisibility.value = !formVisibility.value;
+    };
 
     const insertNote = async () => {
       if (await validNote()) {
-        // insert note to the db
+        try {
+          const response = await fetch(`${API_URL}/api/v1/notes`, {
+            method: 'POST',
+            body: JSON.stringify(newNote.value),
+            headers: {
+              'Content-type': 'application/json',
+              Authorization: `Bearer ${localStorage.token}`,
+            },
+          });
 
-        const response = await fetch(`${API_URL}/api/v1/notes`, {
-          method: 'POST',
-          body: JSON.stringify(newNote.value),
-          headers: {
-            'Content-type': 'application/json',
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.message);
 
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-
-        console.log(result);
+          console.log(result);
+        } catch (error) {
+          setErrorMessage(error.message);
+        }
       }
     };
 
@@ -132,7 +186,7 @@ export default {
 
     // watch
     // expose
-    return { user, toggleForm };
+    return { user, newNote, formVisibility, toggleForm, insertNote };
   },
 };
 </script>
