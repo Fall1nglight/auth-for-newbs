@@ -7,8 +7,21 @@
 </template>
 
 <script>
+import { provide } from '@vue/runtime-core';
+
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+
+const msgTypes = {
+  primary: 'primary',
+  secondary: 'secondary',
+  success: 'success',
+  error: 'danger',
+  warning: 'warning',
+  info: 'info',
+  light: 'light',
+  dark: 'dark',
+};
 
 export default {
   name: 'App',
@@ -17,7 +30,9 @@ export default {
     Footer,
   },
 
-  setup() {},
+  setup() {
+    provide('msgTypes', msgTypes);
+  },
 };
 </script>
 

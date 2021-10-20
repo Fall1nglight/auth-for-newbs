@@ -4,7 +4,7 @@
 
     <div class="row justify-content-md-center">
       <div class="col-md-10 col-lg-6">
-        <DisplayMessage :message="errorMessage" />
+        <DisplayMessage :messageObj="displayMsg" />
       </div>
     </div>
 
@@ -65,8 +65,7 @@
 </template>
 
 <script>
-import { ref } from '@vue/reactivity';
-import { watch } from '@vue/runtime-core';
+import { inject, watch, ref } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 import Joi from 'joi';
 
@@ -104,6 +103,9 @@ export default {
     // router
     const router = useRouter();
 
+    //inject
+    const msgTypes = inject('msgTypes');
+
     // refs
     const user = ref({
       username: '',
@@ -111,20 +113,19 @@ export default {
       confirmPassword: '',
     });
 
-    const errorMessage = ref('');
-
-    // watch
-    watch(user.value, () => {
-      setErrorMessage('');
+    const displayMsg = ref({
+      message: '',
+      type: '',
     });
 
     // functions
-    const setErrorMessage = (message) => {
-      errorMessage.value = message;
+    const setDisplayMessage = (msg, msgType) => {
+      displayMsg.value.message = msg;
+      displayMsg.value.type = msgType || '';
     };
 
     const signup = async () => {
-      errorMessage.value = '';
+      setDisplayMessage('');
 
       if (await validUser()) {
         try {
@@ -145,14 +146,14 @@ export default {
           localStorage.token = result.token;
           router.push({ path: 'dashboard' });
         } catch (error) {
-          setErrorMessage(error.message);
+          setDisplayMessage(error.message, msgTypes.error);
         }
       }
     };
 
     const validUser = async () => {
       if (user.value.password !== user.value.confirmPassword) {
-        setErrorMessage('Passwords must match.');
+        setDisplayMessage('Passwords must match.', msgTypes.error);
         return false;
       }
 
@@ -161,16 +162,21 @@ export default {
         return true;
       } catch (error) {
         if (error.message.includes('username')) {
-          setErrorMessage('Username is invalid.');
+          setDisplayMessage('Username is invalid.', msgTypes.error);
         } else {
-          setErrorMessage('Password is invalid.');
+          setDisplayMessage('Password is invalid.', msgTypes.error);
         }
         return false;
       }
     };
 
+    // watch
+    watch(user.value, () => {
+      setDisplayMessage('');
+    });
+
     // expose
-    return { user, signup, errorMessage };
+    return { user, signup, displayMsg };
   },
 };
 </script>

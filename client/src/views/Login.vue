@@ -4,7 +4,7 @@
 
     <div class="row justify-content-md-center">
       <div class="col-md-5">
-        <DisplayMessage :message="errorMessage" />
+        <DisplayMessage :messageObj="displayMsg" />
       </div>
     </div>
 
@@ -49,8 +49,7 @@
 </template>
 
 <script>
-import { ref } from '@vue/reactivity';
-import { watch } from '@vue/runtime-core';
+import { inject, watch, ref } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 import Joi from 'joi';
 
@@ -72,17 +71,6 @@ const schema = Joi.object({
 
 const API_URl = 'http://localhost:5000/auth/login';
 
-const msgTypes = {
-  primary: 'primary',
-  secondary: 'secondary',
-  success: 'success',
-  error: 'danger',
-  warning: 'warning',
-  info: 'info',
-  light: 'light',
-  dark: 'dark',
-};
-
 export default {
   name: 'Login',
   components: {
@@ -92,6 +80,9 @@ export default {
   setup() {
     // router
     const router = useRouter();
+
+    // inject
+    const msgTypes = inject('msgTypes');
 
     // refs
     const user = ref({
@@ -104,17 +95,10 @@ export default {
       type: '',
     });
 
-    // todo, if type is missing in fucntion fall back to default
-
-    // watch
-    watch(user.value, () => {
-      setErrorMessage('');
-    });
-
     // functions
     const setDisplayMessage = (msg, msgType) => {
       displayMsg.value.message = msg;
-      displayMsg.value.type = msgType;
+      displayMsg.value.type = msgType || '';
     };
 
     const login = async () => {
@@ -139,7 +123,7 @@ export default {
           localStorage.token = result.token;
           router.push({ path: 'dashboard' });
         } catch (error) {
-          setErrorMessage(error.message);
+          setDisplayMessage(error.message, msgTypes.error);
         }
       }
     };
@@ -150,13 +134,19 @@ export default {
         return true;
       } catch (error) {
         if (error.message.includes('username')) {
-          setErrorMessage('Username is invalid.');
+          setDisplayMessage('Username is invalid.', msgTypes.error);
         } else {
-          setErrorMessage('Password is invalid.');
+          setDisplayMessage('Password is invalid.', msgTypes.error);
         }
         return false;
       }
     };
+
+    // watch
+    watch(user.value, () => {
+      setDisplayMessage('');
+    });
+
     // expose
     return { user, login, displayMsg };
   },

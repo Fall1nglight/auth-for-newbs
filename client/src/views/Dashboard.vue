@@ -15,7 +15,7 @@
     </div>
 
     <div class="col-md-5">
-      <DisplayMessage :type="displayMsg.type" :message="displayMsg.message" />
+      <DisplayMessage :messageObj="displayMsg" />
 
       <div class="form-check form-switch">
         <input
@@ -29,7 +29,9 @@
         >
       </div>
 
-      <div class="mt-3" v-if="formVisibility">
+      <!-- this will be a problem on small devices -->
+
+      <div class="mt-3" :class="{ invisible: !formVisibility }">
         <form @submit.prevent="insertNote" class="text-black">
           <div class="mb-3">
             <label for="inputTitle" class="form-label">Note title</label>
@@ -65,7 +67,7 @@
 </template>
 
 <script>
-import { onMounted, ref, watch } from '@vue/runtime-core';
+import { inject, onMounted, ref, watch } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 
 import DisplayMessage from '../components/DisplayMessage';
@@ -85,17 +87,6 @@ const schema = Joi.object({
 
 const API_URL = 'http://localhost:5000';
 
-const msgTypes = {
-  primary: 'primary',
-  secondary: 'secondary',
-  success: 'success',
-  error: 'danger',
-  warning: 'warning',
-  info: 'info',
-  light: 'light',
-  dark: 'dark',
-};
-
 export default {
   name: 'Dashboard',
   components: {
@@ -105,6 +96,9 @@ export default {
   setup() {
     // router
     const router = useRouter();
+
+    // inject
+    const msgTypes = inject('msgTypes');
 
     // refs
     const user = ref({
@@ -126,11 +120,7 @@ export default {
       type: '',
     });
 
-    // todo: use bootstrap invisible instead of v-if
-    // todo: refactor changes in other components (login, signup)
-
     // hooks
-    // check if this hook is needed
     onMounted(async () => {
       await validateUser();
     });
@@ -138,7 +128,7 @@ export default {
     // functions
     const setDisplayMessage = (msg, msgType) => {
       displayMsg.value.message = msg;
-      displayMsg.value.type = msgType;
+      displayMsg.value.type = msgType || '';
     };
 
     const logout = () => {
@@ -175,6 +165,8 @@ export default {
     };
 
     const insertNote = async () => {
+      setDisplayMessage('');
+
       if (await validNote()) {
         try {
           const response = await fetch(`${API_URL}/api/v1/notes`, {
