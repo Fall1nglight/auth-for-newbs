@@ -15,7 +15,7 @@
     </div>
 
     <div class="col-md-5">
-      <DisplayMessage :message="errorMessage" />
+      <DisplayMessage :type="displayMsg.type" :message="displayMsg.message" />
 
       <div class="form-check form-switch">
         <input
@@ -85,6 +85,17 @@ const schema = Joi.object({
 
 const API_URL = 'http://localhost:5000';
 
+const msgTypes = {
+  primary: 'primary',
+  secondary: 'secondary',
+  success: 'success',
+  error: 'danger',
+  warning: 'warning',
+  info: 'info',
+  light: 'light',
+  dark: 'dark',
+};
+
 export default {
   name: 'Dashboard',
   components: {
@@ -110,34 +121,24 @@ export default {
 
     const formVisibility = ref(false);
 
-    const errorMessage = ref('');
-
-    const message = ref({
+    const displayMsg = ref({
       message: '',
       type: '',
     });
 
     // todo: use bootstrap invisible instead of v-if
-    // todo: displayMessage ->
-    // todo: verify types, choose alert style accordingly
     // todo: refactor changes in other components (login, signup)
 
     // hooks
+    // check if this hook is needed
     onMounted(async () => {
       await validateUser();
     });
 
     // functions
-    const setErrorMessage = (msg, msgType) => {
-      errorMessage.value = msg;
-
-      message.value.message = msg;
-      message.value.type = 'error';
-    };
-
-    const setMessage = (msg, msgType) => {
-      message.value.message = msg;
-      message.value.type = msgType;
+    const setDisplayMessage = (msg, msgType) => {
+      displayMsg.value.message = msg;
+      displayMsg.value.type = msgType;
     };
 
     const logout = () => {
@@ -169,12 +170,11 @@ export default {
         user.value.iat = result.user.iat;
         user.value.username = result.user.username;
       } catch (error) {
-        setErrorMessage(error.message);
+        setDisplayMessage(error.message, msgTypes.error);
       }
     };
 
     const insertNote = async () => {
-      console.log(await validNote());
       if (await validNote()) {
         try {
           const response = await fetch(`${API_URL}/api/v1/notes`, {
@@ -195,7 +195,7 @@ export default {
           newNote.value.title = '';
           newNote.value.note = '';
         } catch (error) {
-          setErrorMessage(error.message);
+          setDisplayMessage(error.message, msgTypes.error);
         }
       }
     };
@@ -205,14 +205,14 @@ export default {
         await schema.validateAsync(newNote.value);
         return true;
       } catch (error) {
-        setErrorMessage(error.message);
+        setDisplayMessage(error.message, msgTypes.error);
         return false;
       }
     };
 
     // watch
     watch(newNote.value, () => {
-      setErrorMessage('');
+      setDisplayMessage('');
     });
 
     // expose
@@ -220,7 +220,7 @@ export default {
       user,
       newNote,
       formVisibility,
-      errorMessage,
+      displayMsg,
       toggleForm,
       insertNote,
     };

@@ -72,6 +72,17 @@ const schema = Joi.object({
 
 const API_URl = 'http://localhost:5000/auth/login';
 
+const msgTypes = {
+  primary: 'primary',
+  secondary: 'secondary',
+  success: 'success',
+  error: 'danger',
+  warning: 'warning',
+  info: 'info',
+  light: 'light',
+  dark: 'dark',
+};
+
 export default {
   name: 'Login',
   components: {
@@ -88,7 +99,12 @@ export default {
       password: '',
     });
 
-    const errorMessage = ref('');
+    const displayMsg = ref({
+      message: '',
+      type: '',
+    });
+
+    // todo, if type is missing in fucntion fall back to default
 
     // watch
     watch(user.value, () => {
@@ -96,17 +112,15 @@ export default {
     });
 
     // functions
-    const setErrorMessage = (message) => {
-      errorMessage.value = message;
+    const setDisplayMessage = (msg, msgType) => {
+      displayMsg.value.message = msg;
+      displayMsg.value.type = msgType;
     };
 
     const login = async () => {
-      errorMessage.value = '';
+      setDisplayMessage('');
 
       if (await validUser()) {
-        console.log(user.value.username);
-        console.log(user.value.password);
-
         try {
           const response = await fetch(API_URl, {
             method: 'POST',
@@ -144,7 +158,7 @@ export default {
       }
     };
     // expose
-    return { user, login, errorMessage };
+    return { user, login, displayMsg };
   },
 };
 </script>
