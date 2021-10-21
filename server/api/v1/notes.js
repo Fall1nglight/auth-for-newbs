@@ -14,6 +14,7 @@ const schema = Joi.object({
 router.get('/', async (req, res, next) => {
   try {
     const userNotes = await notes.find({ user_id: req.user._id });
+
     res.json({ userNotes });
   } catch (error) {
     next(error);

@@ -1,5 +1,5 @@
 <template>
-  <div class="row mb-3 justify-content-evenly">
+  <div class="row mb-3 justify-content-between">
     <div class="col-md-5 text-black">
       <div class="h1">Dashboard</div>
       <div class="h5">Welcome, {{ user.username }}</div>
@@ -29,9 +29,7 @@
         >
       </div>
 
-      <!-- this will be a problem on small devices -->
-
-      <div class="mt-3" :class="{ invisible: !formVisibility }">
+      <div class="mt-3" v-if="formVisibility">
         <form @submit.prevent="insertNote" class="text-black">
           <div class="mb-3">
             <label for="inputTitle" class="form-label">Note title</label>
@@ -64,6 +62,10 @@
       </div>
     </div>
   </div>
+
+  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    <Notes :arrayOfNotes="notes" />
+  </div>
 </template>
 
 <script>
@@ -71,6 +73,7 @@ import { inject, onMounted, ref, watch } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 
 import DisplayMessage from '../components/DisplayMessage';
+import Notes from '../components/Notes';
 
 import Joi from 'joi';
 
@@ -92,6 +95,7 @@ export default {
   name: 'Dashboard',
   components: {
     DisplayMessage,
+    Notes,
   },
 
   setup() {
@@ -192,6 +196,8 @@ export default {
 
           newNote.value.title = '';
           newNote.value.note = '';
+
+          await getNotes();
         } catch (error) {
           setDisplayMessage(error.message, msgTypes.error);
         }
@@ -220,7 +226,14 @@ export default {
         if (!response.ok || !result.userNotes)
           throw new Error('Could not fetch your notes. (Backend error)');
 
-        notes.value.push(result.userNotes);
+        // protect array from duplicates
+        // ? should i use a Set instead?
+
+        notes.value = [];
+
+        result.userNotes.forEach((note) => {
+          notes.value.push(note);
+        });
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }
