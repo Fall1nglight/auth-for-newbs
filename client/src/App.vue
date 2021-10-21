@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { provide } from '@vue/runtime-core';
+import { provide, ref } from '@vue/runtime-core';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';

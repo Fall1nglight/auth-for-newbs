@@ -13,7 +13,8 @@ const schema = Joi.object({
 
 router.get('/', async (req, res, next) => {
   try {
-    const userNotes = await notes.find({ user_id: req.user._id });
+    const { user } = req;
+    const userNotes = await notes.find({ user_id: user._id });
 
     res.json({ userNotes });
   } catch (error) {
@@ -23,11 +24,15 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const { body } = req;
+    const { body, user } = req;
 
     await schema.validateAsync(body);
 
-    const newNote = await notes.insert({ ...body, user_id: req.user._id });
+    const newNote = await notes.insert({
+      ...body,
+      createdAt: new Date().getTime(),
+      user_id: user._id,
+    });
 
     res.json({ newNote });
   } catch (error) {

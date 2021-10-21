@@ -17,21 +17,24 @@
       <div class="collapse navbar-collapse" id="navbarColor01">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <router-link to="/" class="nav-link active"
-              >Homepage
-              <span class="visually-hidden">(current)</span>
-            </router-link>
+            <router-link to="/" class="nav-link">Homepage </router-link>
           </li>
-          <li class="nav-item">
+
+          <li v-if="displayNavItems" class="nav-item">
             <router-link to="/signup" class="nav-link">Signup</router-link>
           </li>
-          <li class="nav-item">
+
+          <li v-if="displayNavItems" class="nav-item">
             <router-link to="/login" class="nav-link">Login</router-link>
           </li>
 
-          <!-- todo: only show logout when the user is logged in -->
+          <li v-if="!displayNavItems" class="nav-item">
+            <router-link to="/dashboard" class="nav-link"
+              >Dashboard</router-link
+            >
+          </li>
 
-          <li class="nav-item">
+          <li v-if="!displayNavItems" class="nav-item">
             <router-link to="/logout" class="nav-link">Logout</router-link>
           </li>
         </ul>
@@ -41,13 +44,38 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
+import { ref, watch } from '@vue/runtime-core';
+import { useRoute } from 'vue-router';
+
+const whitelistedRoutes = ['/', '/signup', '/login'];
+
 export default {
   name: 'Navbar',
 
   setup() {
-    //router
-    const router = useRouter();
+    //route
+    const route = useRoute();
+
+    // ref
+    const displayNavItems = ref(true);
+
+    // watch
+    watch(route, () => {
+      // return if we are on the logout page
+      if (route.path === '/logout') return;
+
+      // hide nav items when we are on a whitelistedRoute or the user has a stored token
+      if (whitelistedRoutes.includes(route.path)) {
+        displayNavItems.value = true;
+      } else {
+        displayNavItems.value = false;
+      }
+
+      if (route.path === '/' && localStorage.token)
+        return (displayNavItems.value = false);
+    });
+
+    return { displayNavItems };
   },
 };
 </script>

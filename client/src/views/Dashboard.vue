@@ -17,7 +17,7 @@
     <div class="col-md-5">
       <DisplayMessage :messageObj="displayMsg" />
 
-      <div class="form-check form-switch">
+      <div class="form-check form-switch" id="switchButton">
         <input
           class="form-check-input"
           type="checkbox"
@@ -160,11 +160,7 @@ export default {
         if (!response.ok) throw new Error(result.message);
         if (!result.user) return logout();
 
-        // ? redirect if there was an error
-
-        // * set values 'manually' so we get corrections
         // todo: refactor this
-
         user.value._id = result.user._id;
         user.value.exp = result.user.exp;
         user.value.iat = result.user.iat;
@@ -226,9 +222,7 @@ export default {
         if (!response.ok || !result.userNotes)
           throw new Error('Could not fetch your notes. (Backend error)');
 
-        // protect array from duplicates
-        // ? should i use a Set instead?
-
+        // * protect array from duplicates
         notes.value = [];
 
         result.userNotes.forEach((note) => {
@@ -259,4 +253,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+#flexSwitchCheckDefault:hover,
+.form-check-label:hover {
+  cursor: pointer;
+}
+</style>
