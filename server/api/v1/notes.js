@@ -11,9 +11,10 @@ const schema = Joi.object({
   note: Joi.string().min(2).max(450).required(),
 });
 
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    console.log(req.user);
+    const userNotes = await notes.find({ user_id: req.user._id });
+    res.json({ userNotes });
   } catch (error) {
     next(error);
   }

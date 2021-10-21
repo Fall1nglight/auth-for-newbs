@@ -114,6 +114,8 @@ export default {
       note: '',
     });
 
+    const notes = ref([]);
+
     const formVisibility = ref(false);
 
     const displayMsg = ref({
@@ -121,11 +123,10 @@ export default {
       type: '',
     });
 
-    const notes = ref([]);
-
     // hooks
     onMounted(async () => {
       await validateUser();
+      await getNotes();
     });
 
     // functions
@@ -154,6 +155,8 @@ export default {
         const result = await response.json();
         if (!response.ok) throw new Error(result.message);
         if (!result.user) return logout();
+
+        // ? redirect if there was an error
 
         // * set values 'manually' so we get corrections
         // todo: refactor this
@@ -185,7 +188,7 @@ export default {
           if (!response.ok) throw new Error(result.message);
 
           if (!result.newNote)
-            return setDisplayMessage('Note was not saved. (Backend error)');
+            throw new Error('Note was not saved. (Backend error)');
 
           newNote.value.title = '';
           newNote.value.note = '';
@@ -207,7 +210,17 @@ export default {
 
     const getNotes = async () => {
       try {
-        const response = await fetch();
+        const response = await fetch(`${API_URL}/api/v1/notes`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.token}`,
+          },
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.userNotes)
+          throw new Error('Could not fetch your notes. (Backend error)');
+
+        notes.value.push(result.userNotes);
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }
