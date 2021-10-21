@@ -12,7 +12,11 @@ const schema = Joi.object({
 });
 
 router.get('/', (req, res, next) => {
-  res.json({ message: 'Hi' });
+  try {
+    console.log(req.user);
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.post('/', async (req, res, next) => {

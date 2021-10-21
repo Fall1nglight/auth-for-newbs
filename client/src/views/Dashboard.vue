@@ -79,6 +79,7 @@ const schema = Joi.object({
     .min(2)
     .max(30)
     .required(),
+
   note: Joi.string()
     .min(2)
     .max(450)
@@ -119,6 +120,8 @@ export default {
       message: '',
       type: '',
     });
+
+    const notes = ref([]);
 
     // hooks
     onMounted(async () => {
@@ -181,8 +184,8 @@ export default {
           const result = await response.json();
           if (!response.ok) throw new Error(result.message);
 
-          if (result.newNote) {
-          }
+          if (!result.newNote)
+            return setDisplayMessage('Note was not saved. (Backend error)');
 
           newNote.value.title = '';
           newNote.value.note = '';
@@ -202,6 +205,14 @@ export default {
       }
     };
 
+    const getNotes = async () => {
+      try {
+        const response = await fetch();
+      } catch (error) {
+        setDisplayMessage(error.message, msgTypes.error);
+      }
+    };
+
     // watch
     watch(newNote.value, () => {
       setDisplayMessage('');
@@ -212,9 +223,11 @@ export default {
       user,
       newNote,
       formVisibility,
+      notes,
       displayMsg,
       toggleForm,
       insertNote,
+      getNotes,
     };
   },
 };
