@@ -72,7 +72,7 @@ export default {
       }
 
       if (route.path === '/' && localStorage.token)
-        return (displayNavItems.value = false);
+        displayNavItems.value = false;
     });
 
     return { displayNavItems };
