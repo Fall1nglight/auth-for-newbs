@@ -69,7 +69,7 @@ import { inject, watch, ref } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 import Joi from 'joi';
 
-import DisplayMessage from '../components/DisplayMessage';
+import DisplayMessage from '../components/DisplayMessage.vue';
 
 const schema = Joi.object({
   username: Joi.string()

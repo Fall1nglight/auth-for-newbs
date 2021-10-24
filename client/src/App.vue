@@ -12,7 +12,7 @@ import { provide, ref } from '@vue/runtime-core';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-const msgTypes = {
+const bootstrapTypes = {
   primary: 'primary',
   secondary: 'secondary',
   success: 'success',
@@ -31,7 +31,7 @@ export default {
   },
 
   setup() {
-    provide('msgTypes', msgTypes);
+    provide('bootstrapTypes', bootstrapTypes);
   },
 };
 </script>

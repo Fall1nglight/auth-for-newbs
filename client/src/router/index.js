@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/Home';
-import Signup from '../views/Signup';
-import Login from '../views/Login';
-import Dashboard from '../views/Dashboard';
-import Logout from '../views/Logout';
-import NotFoundPage from '../views/NotFoundPage';
+import Home from '../views/Home.vue';
+import Signup from '../views/Signup.vue';
+import Login from '../views/Login.vue';
+import Dashboard from '../views/Dashboard.vue';
+import Logout from '../views/Logout.vue';
+import NotFoundPage from '../views/NotFoundPage.vue';
 
 const loggedInRedirectDashboard = (to, from, next) => {
   if (localStorage.token) {

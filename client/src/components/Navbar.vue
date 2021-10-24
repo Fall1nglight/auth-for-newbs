@@ -47,7 +47,7 @@
 import { ref, watch } from '@vue/runtime-core';
 import { useRoute } from 'vue-router';
 
-const whitelistedRoutes = ['/', '/signup', '/login'];
+const protectedRoutes = ['/', '/login', '/signup'];
 
 export default {
   name: 'Navbar',
@@ -61,18 +61,16 @@ export default {
 
     // watch
     watch(route, () => {
-      // return if we are on the logout page
-      if (route.path === '/logout') return;
-
-      // hide nav items when we are on a whitelistedRoute or the user has a stored token
-      if (whitelistedRoutes.includes(route.path)) {
-        displayNavItems.value = true;
-      } else {
-        displayNavItems.value = false;
-      }
-
+      // if we are on the homepage and the user has auth-token
       if (route.path === '/' && localStorage.token)
-        displayNavItems.value = false;
+        return (displayNavItems.value = false);
+
+      // if we are on one of the protected routes
+      if (protectedRoutes.includes(route.path))
+        return (displayNavItems.value = true);
+
+      // if we are not on a protected route
+      displayNavItems.value = false;
     });
 
     return { displayNavItems };

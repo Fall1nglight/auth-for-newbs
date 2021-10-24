@@ -1,9 +1,18 @@
 <template>
-  <Note v-for="note in arrayOfNotes" :note="note" :key="note._id" />
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <Note
+      @toggleNoteReminder="$emit('toggleNoteReminder', $event)"
+      @editNote="$emit('editNote', $event)"
+      @deleteNote="$emit('deleteNote', $event)"
+      v-for="note in notes"
+      :note="note"
+      :key="note._id"
+    />
+  </div>
 </template>
 
 <script>
-import Note from './Note';
+import Note from './Note.vue';
 
 export default {
   name: 'Notes',
@@ -11,8 +20,9 @@ export default {
     Note,
   },
   props: {
-    arrayOfNotes: Array,
+    notes: Array,
   },
+  emits: ['toggleNoteReminder', 'editNote', 'deleteNote'],
 };
 </script>
 

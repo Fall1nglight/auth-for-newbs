@@ -22,7 +22,7 @@
           class="form-check-input"
           type="checkbox"
           id="flexSwitchCheckDefault"
-          @click="toggleForm"
+          @click="formVisibility = !formVisibility"
         />
         <label class="form-check-label text-black" for="flexSwitchCheckDefault"
           >Toggle form</label
@@ -63,17 +63,20 @@
     </div>
   </div>
 
-  <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-    <Notes :arrayOfNotes="notes" />
-  </div>
+  <Notes
+    @toggleNoteReminder="toggleNoteReminder"
+    @editNote="editNote"
+    @deleteNote="deleteNote"
+    :notes="notes"
+  />
 </template>
 
 <script>
 import { inject, onMounted, ref, watch } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 
-import DisplayMessage from '../components/DisplayMessage';
-import Notes from '../components/Notes';
+import DisplayMessage from '../components/DisplayMessage.vue';
+import Notes from '../components/Notes.vue';
 
 import Joi from 'joi';
 
@@ -103,7 +106,7 @@ export default {
     const router = useRouter();
 
     // inject
-    const msgTypes = inject('msgTypes');
+    const msgTypes = inject('bootstrapTypes');
 
     // refs
     const user = ref({
@@ -130,7 +133,7 @@ export default {
     // hooks
     onMounted(async () => {
       await validateUser();
-      await getNotes();
+      await fetchNotes();
     });
 
     // functions
@@ -142,10 +145,6 @@ export default {
     const logout = () => {
       localStorage.removeItem('token');
       router.push({ path: 'login' });
-    };
-
-    const toggleForm = () => {
-      formVisibility.value = !formVisibility.value;
     };
 
     const validateUser = async () => {
@@ -161,10 +160,7 @@ export default {
         if (!result.user) return logout();
 
         // todo: refactor this
-        user.value._id = result.user._id;
-        user.value.exp = result.user.exp;
-        user.value.iat = result.user.iat;
-        user.value.username = result.user.username;
+        user.value = result.user;
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }
@@ -187,13 +183,14 @@ export default {
           const result = await response.json();
           if (!response.ok) throw new Error(result.message);
 
-          if (!result.newNote)
+          if (!result.success)
             throw new Error('Note was not saved. (Backend error)');
 
+          formVisibility.value = false;
           newNote.value.title = '';
           newNote.value.note = '';
 
-          await getNotes();
+          await fetchNotes();
         } catch (error) {
           setDisplayMessage(error.message, msgTypes.error);
         }
@@ -210,7 +207,7 @@ export default {
       }
     };
 
-    const getNotes = async () => {
+    const fetchNotes = async () => {
       try {
         const response = await fetch(`${API_URL}/api/v1/notes`, {
           headers: {
@@ -233,6 +230,84 @@ export default {
       }
     };
 
+    const toggleNoteReminder = async (noteToUpdate) => {
+      try {
+        const { _id: id, reminder } = noteToUpdate;
+
+        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ reminder: !reminder }),
+          headers: {
+            'Content-type': 'application/json',
+            Authorization: `Bearer ${localStorage.token}`,
+          },
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+        if (!result.success)
+          return setDisplayMessage(
+            'Failed to update note. Please try again later. (Backend error)'
+          );
+
+        await fetchNotes();
+      } catch (error) {
+        setDisplayMessage(error.message, msgTypes.error);
+      }
+    };
+
+    const editNote = async (noteToUpdate) => {
+      try {
+        const { _id: id, title, note } = noteToUpdate;
+
+        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            title: title,
+            note: note,
+          }),
+          headers: {
+            'Content-type': 'application/json',
+            Authorization: `Bearer ${localStorage.token}`,
+          },
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+        if (!result.success)
+          throw new Error(
+            'Failed to update note. Please try again later. (Backend error)'
+          );
+
+        await fetchNotes();
+      } catch (error) {
+        setDisplayMessage(error.message, msgTypes.error);
+      }
+    };
+
+    const deleteNote = async (noteToUpdate) => {
+      if (!confirm('Are you sure you want to delete this note?')) return;
+
+      try {
+        const { _id: id } = noteToUpdate;
+        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${localStorage.token}`,
+          },
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+        if (!result.success)
+          throw new Error(
+            'Failed to delete note. Please try again later. (Backend error)'
+          );
+
+        await fetchNotes();
+      } catch (error) {
+        setDisplayMessage(error.message, msgTypes.error);
+      }
+    };
+
     // watch
     watch(newNote.value, () => {
       setDisplayMessage('');
@@ -245,9 +320,11 @@ export default {
       formVisibility,
       notes,
       displayMsg,
-      toggleForm,
       insertNote,
-      getNotes,
+      fetchNotes,
+      toggleNoteReminder,
+      editNote,
+      deleteNote,
     };
   },
 };
