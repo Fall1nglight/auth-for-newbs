@@ -2,11 +2,37 @@ const express = require('express');
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 
 const db = require('../db/connection');
+const rateLimitFns = require('../ratelimit/functions');
 
 const users = db.get('users');
 const router = express.Router();
+
+const signupLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message:
+    'Too many accounts created from this IP, please try again after an hour.',
+
+  handler: rateLimitFns.handler,
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 10,
+  message:
+    'Too many login attempts from this IP, please try again after 5 minutes.',
+
+  handler: rateLimitFns.handler,
+});
+
+const checkLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: rateLimitFns.isValidUser,
+  handler: rateLimitFns.handler,
+});
 
 users.createIndex('username', { unique: true });
 
@@ -48,7 +74,7 @@ const throwError = (error) => {
   throw new Error(error);
 };
 
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', signupLimiter, async (req, res, next) => {
   try {
     const {
       body: sentUser,
@@ -78,7 +104,7 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', loginLimiter, async (req, res, next) => {
   try {
     const {
       body: sentUser,
@@ -105,7 +131,7 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
-router.get('/checkuser', (req, res, next) => {
+router.get('/checkuser', checkLimiter, (req, res, next) => {
   res.json({ user: req.user });
 });
 

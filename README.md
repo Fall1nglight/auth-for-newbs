@@ -25,9 +25,8 @@ Add JWT-based authentication to a Node/Express/Mongo app.
   - [ ] de-activate users
 
 - [ ] Admin can see any page on site
-- [ ] Rate limiting
+- [x] Rate limiting
 
-  - [ ] Prevent brute force logins
-  - [ ] Lock out account after too many login attempts
+  - [x] Prevent brute force logins
 
 - [x] Password strength meter!
