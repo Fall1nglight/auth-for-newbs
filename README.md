@@ -30,4 +30,4 @@ Add JWT-based authentication to a Node/Express/Mongo app.
   - [ ] Prevent brute force logins
   - [ ] Lock out account after too many login attempts
 
-- [ ] Password strength meter!
+- [x] Password strength meter!

@@ -30,13 +30,16 @@
         <input
           v-model="user.password"
           type="password"
-          class="form-control"
+          class="form-control mb-1"
           placeholder="Please enter your password."
           aria-placeholder="Please enter your password."
           autocomplete="new-password"
           id="inputPassword"
           required
         />
+        <small :class="['text-mute', pwdStrength ? '' : 'invisible']"
+          >Password strength: {{ pwdStrength }}</small
+        >
       </div>
 
       <div class="col-md-5 col-lg-3">
@@ -46,7 +49,7 @@
         <input
           v-model="user.confirmPassword"
           type="password"
-          class="form-control"
+          class="form-control mb-1"
           placeholder="Please confirm your password."
           aria-placeholder="Please confirm your password."
           autocomplete="new-password"
@@ -65,9 +68,11 @@
 </template>
 
 <script>
-import { inject, watch, ref } from '@vue/runtime-core';
+import { inject, watch, ref, computed } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
+
 import Joi from 'joi';
+import { passwordStrength } from 'check-password-strength';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 
@@ -152,13 +157,14 @@ export default {
     };
 
     const validUser = async () => {
-      if (user.value.password !== user.value.confirmPassword) {
-        setDisplayMessage('Passwords must match.', msgTypes.error);
-        return false;
-      }
-
       try {
         await schema.validateAsync(user.value);
+
+        if (user.value.password !== user.value.confirmPassword) {
+          setDisplayMessage('Passwords must match.', msgTypes.error);
+          return false;
+        }
+
         return true;
       } catch (error) {
         if (error.message.includes('username')) {
@@ -175,8 +181,13 @@ export default {
       setDisplayMessage('');
     });
 
+    //computed
+    const pwdStrength = computed(() =>
+      user.value.password ? passwordStrength(user.value.password).value : ''
+    );
+
     // expose
-    return { user, signup, displayMsg };
+    return { user, signup, displayMsg, pwdStrength };
   },
 };
 </script>
