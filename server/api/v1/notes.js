@@ -1,9 +1,9 @@
 const express = require('express');
 const Joi = require('joi');
 
-const db = require('./../../db/connection');
-const notes = db.get('notes');
+const db = require('../../db/connection');
 
+const notes = db.get('notes');
 const router = express.Router();
 
 const insertSchema = Joi.object({

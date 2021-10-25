@@ -104,7 +104,7 @@ export default {
     const router = useRouter();
 
     //inject
-    const msgTypes = inject('msgTypes');
+    const msgTypes = inject('bootstrapTypes');
 
     // refs
     const user = ref({

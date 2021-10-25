@@ -57,19 +57,19 @@
 
       <div class="card-footer">
         <small class="text-muted d-flex w-100"
-          >Created {{ createdAt }} ago</small
+          >Created {{ formatDate(createdAt) }} ago</small
         >
-        <small class="text-muted">Last updated {{ updatedAt }} ago</small>
+        <small v-if="updatedAt" class="text-muted"
+          >Last updated {{ formatDate(updatedAt) }} ago</small
+        >
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { computed, ref } from '@vue/reactivity';
+import { ref, computed } from '@vue/reactivity';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-// todo list
-// 'expose' comments inside other components setup function
 
 export default {
   name: 'Note',
@@ -101,13 +101,11 @@ export default {
       emit('deleteNote', props.note);
     };
 
-    const createdAt = computed(() =>
-      formatDistanceToNow(new Date(props.note.createdAt))
-    );
+    const formatDate = (date) => formatDistanceToNow(new Date(date));
 
-    const updatedAt = computed(() =>
-      formatDistanceToNow(new Date(props.note.updatedAt))
-    );
+    //computed
+    const createdAt = computed(() => props.note.createdAt);
+    const updatedAt = computed(() => props.note.updatedAt);
 
     // expose
     return {
@@ -115,6 +113,7 @@ export default {
       editState,
       createdAt,
       updatedAt,
+      formatDate,
       toggleNoteReminder,
       editNote,
       deleteNote,

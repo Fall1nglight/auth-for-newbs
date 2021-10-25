@@ -4,10 +4,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const db = require('../db/connection');
-const users = db.get('users');
-users.createIndex('username', { unique: true });
 
+const users = db.get('users');
 const router = express.Router();
+
+users.createIndex('username', { unique: true });
 
 const schema = Joi.object({
   username: Joi.string()
@@ -19,13 +20,6 @@ const schema = Joi.object({
   password: Joi.string().regex(/^\S+$/).min(10).max(30).required(),
 });
 
-// ! Remove this later
-router.get('/', (req, res) => {
-  res.json({
-    message: 'Hi Auth!',
-  });
-});
-
 const respondWithError = (res, next, error, statusCode) => {
   res.status(statusCode);
   next(error);
@@ -35,6 +29,8 @@ const createTokenSendResponse = (user, res, next) => {
   const payload = {
     _id: user._id,
     username: user.username,
+    role: user.role,
+    active: user.active,
   };
 
   jwt.sign(
@@ -68,7 +64,13 @@ router.post('/signup', async (req, res, next) => {
     const newUser = await users.insert({
       username: username,
       password: hashedPassword,
+      active: true,
+      role: 'user',
+      createdAt: new Date().getTime(),
+      updatedAt: 0,
     });
+
+    if (!newUser) throwError('Failed to register. Please try again later.');
 
     createTokenSendResponse(newUser, res, next);
   } catch (error) {

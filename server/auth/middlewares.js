@@ -1,5 +1,11 @@
 const jwt = require('jsonwebtoken');
 
+const unAuthorized = (res, next) => {
+  const error = new Error('Un-Aothorized request');
+  res.status(401);
+  next(error);
+};
+
 const checkTokenSetUser = (req, res, next) => {
   const authHeader = req.get('Authorization');
   if (!authHeader) return next();
@@ -22,10 +28,16 @@ const isLoggedIn = (req, res, next) => {
   if (req.user) {
     next();
   } else {
-    const error = new Error('Un-Aothorized request');
-    res.status(401);
-    next(error);
+    unAuthorized(res, next);
   }
 };
 
-module.exports = { checkTokenSetUser, isLoggedIn };
+const isAdmin = (req, res, next) => {
+  if (req.user.role === 'admin') {
+    next();
+  } else {
+    unAuthorized(res, next);
+  }
+};
+
+module.exports = { checkTokenSetUser, isLoggedIn, isAdmin };

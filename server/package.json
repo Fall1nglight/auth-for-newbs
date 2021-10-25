@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node --no-deprecation index.js",
-    "dev": "nodemon --no-deprecation index.js"
+    "dev": "nodemon --no-deprecation index.js",
+    "seed:admin": "node --no-deprecation tasks/create_admin_user.js"
   },
   "keywords": [],
   "author": "",

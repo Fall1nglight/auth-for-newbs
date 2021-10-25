@@ -2,16 +2,15 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const volleyball = require('volleyball');
+
 const auth = require('./auth');
 const notes = require('./api/v1/notes');
+const users = require('./api/v1/users');
 const middlewares = require('./auth/middlewares');
 
 require('dotenv').config();
 
 const app = express();
-
-// todo: when tokensecret error because no token was set
-// todo: do not insert user into db
 
 app.use(volleyball);
 app.use(
@@ -23,14 +22,9 @@ app.use(helmet());
 app.use(express.json());
 app.use(middlewares.checkTokenSetUser);
 
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Hello World!',
-  });
-});
-
 app.use('/auth', auth);
 app.use('/api/v1/notes', middlewares.isLoggedIn, notes);
+app.use('/api/v1/users', middlewares.isLoggedIn, middlewares.isAdmin, users);
 
 const notFound = (req, res, next) => {
   res.status(404);

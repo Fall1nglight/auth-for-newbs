@@ -7,10 +7,10 @@
 </template>
 
 <script>
-import { provide, ref } from '@vue/runtime-core';
+import { provide } from '@vue/runtime-core';
 
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import Navbar from './components/Navbar.vue';
+import Footer from './components/Footer.vue';
 
 const bootstrapTypes = {
   primary: 'primary',
