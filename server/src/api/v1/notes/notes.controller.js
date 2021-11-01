@@ -1,23 +1,7 @@
-const express = require('express');
-const Joi = require('joi');
+const notes = require('./notes.model');
+const schemas = require('./notes.schemas');
 
-const db = require('../../db/connection');
-
-const notes = db.get('notes');
-const router = express.Router();
-
-const insertSchema = Joi.object({
-  title: Joi.string().min(2).max(30).required(),
-  note: Joi.string().min(2).max(450).required(),
-});
-
-const updateSchema = Joi.object({
-  title: Joi.string().min(2).max(30),
-  note: Joi.string().min(2).max(450),
-  reminder: Joi.boolean(),
-});
-
-router.get('/', async (req, res, next) => {
+const get = async (req, res, next) => {
   try {
     const {
       user: { _id: userId },
@@ -28,16 +12,14 @@ router.get('/', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+};
 
-router.post('/', async (req, res, next) => {
+const post = async (req, res, next) => {
   try {
     const {
       body,
       user: { _id: userId },
     } = req;
-
-    await insertSchema.validateAsync(body);
 
     const newNote = await notes.insert({
       ...body,
@@ -50,18 +32,18 @@ router.post('/', async (req, res, next) => {
     if (!newNote) return res.json({ success: false });
     res.json({ success: true });
   } catch (error) {
+    res.status(422);
     next(error);
   }
-});
+};
 
-router.patch('/:id', async (req, res, next) => {
+const patch = async (req, res, next) => {
   try {
     const {
       body,
       params: { id: noteId },
       user: { _id: userId },
     } = req;
-    await updateSchema.validateAsync(body);
 
     const updatedNote = await notes.findOneAndUpdate(
       { _id: noteId, userId },
@@ -73,11 +55,12 @@ router.patch('/:id', async (req, res, next) => {
     if (!updatedNote) return res.json({ success: false });
     res.json({ success: true });
   } catch (error) {
+    res.status(422);
     next(error);
   }
-});
+};
 
-router.delete('/:id', async (req, res, next) => {
+const deleteRoute = async (req, res, next) => {
   try {
     const {
       params: { id: noteId },
@@ -94,6 +77,11 @@ router.delete('/:id', async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  get,
+  post,
+  patch,
+  deleteRoute,
+};

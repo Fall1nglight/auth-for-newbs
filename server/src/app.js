@@ -5,8 +5,8 @@ const volleyball = require('volleyball');
 const rateLimit = require('express-rate-limit');
 
 const auth = require('./auth/auth.routes');
-const notes = require('./api/v1/notes');
-const users = require('./api/v1/users');
+const notes = require('./api/v1/notes/notes.routes');
+const users = require('./api/v1/users/users');
 const middlewares = require('./auth/auth.middlewares');
 const rateLimitFns = require('./ratelimit/functions');
 

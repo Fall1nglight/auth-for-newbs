@@ -9,13 +9,17 @@ const db = require('../db/connection');
 const users = db.get('users');
 
 const newUser = {
-  username: 'testUser',
+  username: 'testUser01',
   password: '0123456789',
 };
 
 describe('POST /auth/signup', () => {
   before(async () => {
-    await users.remove({});
+    try {
+      await users.remove({});
+    } catch (error) {
+      console.error(error);
+    }
   });
 
   it('should require a username', async () => {
