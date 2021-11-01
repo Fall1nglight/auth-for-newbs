@@ -20,9 +20,9 @@ const updateSchema = Joi.object({
 router.get('/', async (req, res, next) => {
   try {
     const {
-      user: { _id: user_id },
+      user: { _id: userId },
     } = req;
-    const userNotes = await notes.find({ user_id: user_id });
+    const userNotes = await notes.find({ userId });
 
     res.json({ userNotes });
   } catch (error) {
@@ -34,7 +34,7 @@ router.post('/', async (req, res, next) => {
   try {
     const {
       body,
-      user: { _id: user_id },
+      user: { _id: userId },
     } = req;
 
     await insertSchema.validateAsync(body);
@@ -44,7 +44,7 @@ router.post('/', async (req, res, next) => {
       reminder: false,
       createdAt: new Date().getTime(),
       updatedAt: 0,
-      user_id: user_id,
+      userId,
     });
 
     if (!newNote) return res.json({ success: false });
@@ -58,13 +58,13 @@ router.patch('/:id', async (req, res, next) => {
   try {
     const {
       body,
-      params: { id: note_id },
-      user: { _id: user_id },
+      params: { id: noteId },
+      user: { _id: userId },
     } = req;
     await updateSchema.validateAsync(body);
 
     const updatedNote = await notes.findOneAndUpdate(
-      { _id: note_id, user_id: user_id },
+      { _id: noteId, userId },
       {
         $set: { ...body, updatedAt: new Date().getTime() },
       }
@@ -80,13 +80,13 @@ router.patch('/:id', async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
   try {
     const {
-      params: { id: note_id },
-      user: { _id: user_id },
+      params: { id: noteId },
+      user: { _id: userId },
     } = req;
 
     const deletedNote = await notes.findOneAndDelete({
-      _id: note_id,
-      user_id: user_id,
+      _id: noteId,
+      userId,
     });
 
     if (!deletedNote) return res.json({ success: false });

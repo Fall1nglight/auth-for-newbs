@@ -4,10 +4,10 @@ const cors = require('cors');
 const volleyball = require('volleyball');
 const rateLimit = require('express-rate-limit');
 
-const auth = require('./auth');
+const auth = require('./auth/auth.routes');
 const notes = require('./api/v1/notes');
 const users = require('./api/v1/users');
-const middlewares = require('./auth/middlewares');
+const middlewares = require('./auth/auth.middlewares');
 const rateLimitFns = require('./ratelimit/functions');
 
 require('dotenv').config();
@@ -41,18 +41,21 @@ app.use(
   users
 );
 
+app.get('/', (_req, res) => {
+  res.json({ message: 'Homepage' });
+});
+
 const notFound = (req, res, next) => {
   res.status(404);
   const error = new Error(`Not Found ${req.originalUrl}`);
   next(error);
 };
 
+// eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
-  const errorMessage = err.message || 'Unknown error on the backend.';
-
   res.status(res.statusCode || 500);
   res.json({
-    message: errorMessage,
+    message: err.message || 'Unknown backend error',
     stack: err.stack,
   });
 };
@@ -60,7 +63,4 @@ const errorHandler = (err, req, res, next) => {
 app.use(notFound);
 app.use(errorHandler);
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
+module.exports = app;

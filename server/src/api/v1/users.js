@@ -14,7 +14,8 @@ const insertSchema = Joi.object({
     .max(30)
     .required(),
 
-  password: Joi.string().regex(/^\S+$/).min(10).max(30).required(),
+  password: Joi.string().regex(/^\S+$/).min(10).max(30)
+    .required(),
   role: Joi.string().valid('user', 'admin'),
   active: Joi.boolean(),
 });
@@ -53,8 +54,8 @@ router.patch('/:id', async (req, res, next) => {
     }
 
     const updatedUser = await users.findOneAndUpdate(
-      { _id: _id },
-      { $set: { ...body, updatedAt: new Date().getTime() } }
+      { _id },
+      { $set: { ...body, updatedAt: new Date().getTime() } },
     );
 
     res.json({ updatedUser });
@@ -72,7 +73,7 @@ router.post('/', async (req, res, next) => {
 
     await insertSchema.validateAsync(body);
 
-    const user = await users.findOne({ username: username });
+    const user = await users.findOne({ username });
     if (user) throw new Error('Username is taken. Please choose another one');
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -85,8 +86,7 @@ router.post('/', async (req, res, next) => {
       updatedAt: 0,
     });
 
-    if (!insertedUser)
-      throw new Error('Failed to insert user. Please try again later.');
+    if (!insertedUser) throw new Error('Failed to insert user. Please try again later.');
 
     res.json({ insertedUser });
   } catch (error) {
@@ -100,10 +100,9 @@ router.delete('/:id', async (req, res, next) => {
       params: { id: _id },
     } = req;
 
-    const deletedUser = await users.findOneAndDelete({ _id: _id });
+    const deletedUser = await users.findOneAndDelete({ _id });
 
-    if (!deletedUser)
-      throw new Error('Failed to delete user. Please try again later.');
+    if (!deletedUser) throw new Error('Failed to delete user. Please try again later.');
 
     res.json({ deletedUser });
   } catch (error) {
