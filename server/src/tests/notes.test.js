@@ -4,6 +4,9 @@ const { expect } = require('chai');
 const app = require('../app');
 const db = require('../db/connection');
 
+let token;
+let noteId;
+
 const notes = db.get('notes');
 
 const newUser = {
@@ -15,9 +18,6 @@ const newNote = {
   title: 'Test note',
   note: 'This is a test note.',
 };
-
-let token = '';
-let noteId = '';
 
 describe('POST /auth/signup', () => {
   before(async () => {

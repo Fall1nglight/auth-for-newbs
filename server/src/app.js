@@ -4,11 +4,7 @@ const cors = require('cors');
 const volleyball = require('volleyball');
 const rateLimit = require('express-rate-limit');
 
-// ? todo routes folder
-
-const auth = require('./auth/auth.routes');
-const notes = require('./api/v1/notes/notes.routes');
-const users = require('./api/v1/users/users');
+const routes = require('./routes');
 const middlewares = require('./auth/auth.middlewares');
 const rateLimitFns = require('./ratelimit/functions');
 
@@ -33,14 +29,14 @@ app.use(helmet());
 app.use(express.json());
 app.use(middlewares.checkTokenSetUser);
 
-app.use('/auth', auth);
-app.use('/api/v1/notes', apiLimiter, middlewares.isLoggedIn, notes);
+app.use('/auth', routes.auth);
+app.use('/api/v1/notes', apiLimiter, middlewares.isLoggedIn, routes.notes);
 app.use(
   '/api/v1/users',
   apiLimiter,
   middlewares.isLoggedIn,
   middlewares.isAdmin,
-  users
+  routes.users
 );
 
 app.get('/', (_req, res) => {

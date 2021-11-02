@@ -14,7 +14,8 @@ const createAdminUser = async () => {
       DEFAULT_ADMIN_PASSWORD: defaultPassword,
     } = process.env;
 
-    if (!defaultUsername || !defaultPassword) throw new Error('Missing variables, please check your .env file!');
+    if (!defaultUsername || !defaultPassword)
+      throw new Error('Missing variables, please check your .env file!');
 
     const hashedPassword = await bcrypt.hash(defaultPassword, 12);
 
@@ -27,13 +28,15 @@ const createAdminUser = async () => {
       updatedAt: 0,
     });
 
-    if (!insertedUser) throw new Error('Failed to inser admin user. Please try again later');
+    if (!insertedUser)
+      throw new Error('Failed to inser admin user. Please try again later');
 
+    // eslint-disable-next-line no-console
     console.log(
-      `Admin user successfully inserted | ${defaultUsername} @ ${defaultPassword}`,
+      `Admin user successfully inserted | ${defaultUsername} @ ${defaultPassword}`
     );
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
   } finally {
     db.close();
   }

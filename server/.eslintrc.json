@@ -12,7 +12,7 @@
   },
   "rules": {
     "no-unused-vars": "warn",
-    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-console": "off",
     "func-names": "off",
     "no-underscore-dangle": "off",
     "consistent-return": "off",

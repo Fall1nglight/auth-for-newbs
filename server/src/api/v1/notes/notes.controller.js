@@ -1,5 +1,5 @@
-const notes = require('./notes.model');
-const schemas = require('./notes.schemas');
+const { notes } = require('./notes.model');
+const { respondWithError } = require('../../../helpers');
 
 const get = async (req, res, next) => {
   try {
@@ -10,7 +10,7 @@ const get = async (req, res, next) => {
 
     res.json({ userNotes });
   } catch (error) {
-    next(error);
+    respondWithError(res, next, error);
   }
 };
 
@@ -32,8 +32,7 @@ const post = async (req, res, next) => {
     if (!newNote) return res.json({ success: false });
     res.json({ success: true });
   } catch (error) {
-    res.status(422);
-    next(error);
+    respondWithError(res, next, error);
   }
 };
 
@@ -55,8 +54,7 @@ const patch = async (req, res, next) => {
     if (!updatedNote) return res.json({ success: false });
     res.json({ success: true });
   } catch (error) {
-    res.status(422);
-    next(error);
+    respondWithError(res, next, error);
   }
 };
 
@@ -75,7 +73,7 @@ const deleteRoute = async (req, res, next) => {
     if (!deletedNote) return res.json({ success: false });
     res.json({ success: true });
   } catch (error) {
-    next(error);
+    respondWithError(res, next, error);
   }
 };
 

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const users = require('./auth.model');
+const { users } = require('./auth.model');
 const schemas = require('./auth.schemas');
 
 const unAuthorized = (res, next) => {

@@ -1,14 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const users = require('./auth.model');
-
-const respondWithError = (res, next, error) => {
-  // set default statusCode to 500 in case it is not defined with res.status
-
-  res.status(res.statusCode === 200 ? 500 : res.statusCode);
-  next(error);
-};
+const { users } = require('./auth.model');
+const { respondWithError } = require('../helpers');
 
 const createTokenSendResponse = (user, res, next) => {
   const payload = {
