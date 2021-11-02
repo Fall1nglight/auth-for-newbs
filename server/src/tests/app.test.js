@@ -1,6 +1,6 @@
 const request = require('supertest');
-// const mocha = require('mocha');
 const { expect } = require('chai');
+
 const app = require('../app');
 
 describe('GET /', () => {

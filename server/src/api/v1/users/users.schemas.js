@@ -21,7 +21,9 @@ const update = Joi.object({
   password: Joi.string().regex(/^\S+$/).min(10).max(30),
   role: Joi.string().valid('user', 'admin'),
   active: Joi.boolean(),
-});
+})
+  .or('username', 'password', 'role', 'active')
+  .required();
 
 module.exports = {
   insert,

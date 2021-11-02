@@ -22,7 +22,7 @@ const post = async (req, res, next) => {
     const user = await users.findOne({ username });
     if (user) {
       res.status(409);
-      throw new Error('Username is taken. Please choose another one');
+      throw new Error('Username is taken. Please choose another one.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
