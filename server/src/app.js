@@ -4,7 +4,7 @@ const cors = require('cors');
 const volleyball = require('volleyball');
 
 const routes = require('./routes');
-const rateLimit = require('./app.ratelimiters');
+const ratelimiters = require('./app.ratelimiters');
 const middlewares = require('./app.middlewares');
 require('dotenv').config();
 
@@ -23,13 +23,13 @@ app.use(middlewares.auth.checkTokenSetUser);
 app.use('/auth', routes.auth);
 app.use(
   '/api/v1/notes',
-  rateLimit.apiLimiter,
+  ratelimiters.api,
   middlewares.auth.isLoggedIn,
   routes.notes
 );
 app.use(
   '/api/v1/users',
-  rateLimit.apiLimiter,
+  ratelimiters.api,
   middlewares.auth.isLoggedIn,
   middlewares.auth.isAdmin,
   routes.users

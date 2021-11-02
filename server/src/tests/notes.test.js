@@ -4,10 +4,13 @@ const { expect } = require('chai');
 const app = require('../app');
 const db = require('../db/connection');
 
+const notes = db.get('notes');
+
 let token;
 let noteId;
 
-const notes = db.get('notes');
+const signupRoute = '/auth/signup';
+const notesRoute = '/api/v1/notes';
 
 const newUser = {
   username: 'testUser02',
@@ -19,7 +22,7 @@ const newNote = {
   note: 'This is a test note.',
 };
 
-describe('POST /auth/signup', () => {
+describe(`POST ${signupRoute}`, () => {
   before(async () => {
     try {
       await notes.remove({});
@@ -29,27 +32,27 @@ describe('POST /auth/signup', () => {
   });
 
   it('should create a new user for testing notes', async () => {
-    const signupResponse = await request(app)
-      .post('/auth/signup')
+    const response = await request(app)
+      .post(signupRoute)
       .send(newUser)
       .expect(200);
 
-    expect(signupResponse.body).to.have.property('token');
+    expect(response.body).to.have.property('token');
 
-    token = signupResponse.body.token;
+    token = response.body.token;
   });
 });
 
-describe('POST /api/v1/notes', () => {
+describe(`POST ${notesRoute}`, () => {
   it('should only allow logged in users to create notes', async () => {
-    const response = await request(app).post('/api/v1/notes').expect(401);
+    const response = await request(app).post(notesRoute).expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
   });
 
   it('should require a title', async () => {
     const response = await request(app)
-      .post('/api/v1/notes')
+      .post(notesRoute)
       .send({ note: newNote.note })
       .set('Authorization', `Bearer ${token}`)
       .expect(422);
@@ -59,7 +62,7 @@ describe('POST /api/v1/notes', () => {
 
   it('should require a note (property)', async () => {
     const response = await request(app)
-      .post('/api/v1/notes')
+      .post(notesRoute)
       .send({ title: newNote.title })
       .set('Authorization', `Bearer ${token}`)
       .expect(422);
@@ -69,7 +72,7 @@ describe('POST /api/v1/notes', () => {
 
   it('should create a new note', async () => {
     const response = await request(app)
-      .post('/api/v1/notes')
+      .post(notesRoute)
       .send(newNote)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
@@ -80,14 +83,14 @@ describe('POST /api/v1/notes', () => {
 
 describe('GET /api/v1/notes/', () => {
   it('should only allow logged in users to visit notes', async () => {
-    const response = await request(app).get('/api/v1/notes').expect(401);
+    const response = await request(app).get(notesRoute).expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
   });
 
   it('should only allow logged in users to visit notes', async () => {
     const response = await request(app)
-      .get('/api/v1/notes')
+      .get(notesRoute)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
@@ -97,10 +100,10 @@ describe('GET /api/v1/notes/', () => {
   });
 });
 
-describe('PATCH /api/v1/notes', () => {
+describe(`PATCH ${notesRoute}`, () => {
   it('should only allow logged in users to update notes', async () => {
     const response = await request(app)
-      .patch(`/api/v1/notes/${noteId}`)
+      .patch(`${notesRoute}/${noteId}`)
       .expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
@@ -108,7 +111,7 @@ describe('PATCH /api/v1/notes', () => {
 
   it('should require title / note / reminder', async () => {
     const response = await request(app)
-      .patch(`/api/v1/notes/${noteId}`)
+      .patch(`${notesRoute}/${noteId}`)
       .send({})
       .set('Authorization', `Bearer ${token}`)
       .expect(422);
@@ -120,7 +123,7 @@ describe('PATCH /api/v1/notes', () => {
 
   it('should update title', async () => {
     const response = await request(app)
-      .patch(`/api/v1/notes/${noteId}`)
+      .patch(`${notesRoute}/${noteId}`)
       .send({ ...newNote, title: 'Updated title' })
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
@@ -130,7 +133,7 @@ describe('PATCH /api/v1/notes', () => {
 
   it('should update note (property)', async () => {
     const response = await request(app)
-      .patch(`/api/v1/notes/${noteId}`)
+      .patch(`${notesRoute}/${noteId}`)
       .send({ ...newNote, note: 'Update note content' })
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
@@ -140,7 +143,7 @@ describe('PATCH /api/v1/notes', () => {
 
   it('should update reminder', async () => {
     const response = await request(app)
-      .patch(`/api/v1/notes/${noteId}`)
+      .patch(`${notesRoute}/${noteId}`)
       .send({ ...newNote, reminder: true })
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
@@ -149,10 +152,10 @@ describe('PATCH /api/v1/notes', () => {
   });
 });
 
-describe('DELETE /api/v1/notes', () => {
+describe(`DELETE ${notesRoute}`, () => {
   it('should only allow logged in users to delete notes', async () => {
     const response = await request(app)
-      .delete(`/api/v1/notes/${noteId}`)
+      .delete(`${notesRoute}/${noteId}`)
       .expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
@@ -160,7 +163,7 @@ describe('DELETE /api/v1/notes', () => {
 
   it('should delete the test note', async () => {
     const response = await request(app)
-      .delete(`/api/v1/notes/${noteId}`)
+      .delete(`${notesRoute}/${noteId}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 

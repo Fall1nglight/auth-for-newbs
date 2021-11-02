@@ -1,6 +1,6 @@
 const express = require('express');
 
-const rateLimit = require('./auth.ratelimiters');
+const ratelimiters = require('./auth.ratelimiters');
 const middlewares = require('./auth.middlewares');
 const controller = require('./auth.controller');
 
@@ -9,17 +9,17 @@ const defaultSignupError = 'Username is taken. Please choose another one.';
 
 const router = express.Router();
 
-router.get('/checkuser', rateLimit.checkUser, controller.checkUser);
+router.get('/checkuser', ratelimiters.checkUser, controller.checkUser);
 router.post(
   '/signup',
-  rateLimit.signup,
+  ratelimiters.signup,
   middlewares.validateUser,
   middlewares.findUser((user) => user, defaultSignupError, 409),
   controller.signup
 );
 router.post(
   '/login',
-  rateLimit.login,
+  ratelimiters.login,
   middlewares.validateUser,
   middlewares.findUser((user) => !(user && user.active), defaultLoginError),
   controller.login

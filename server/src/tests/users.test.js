@@ -5,10 +5,13 @@ const { expect } = require('chai');
 const app = require('../app');
 const db = require('../db/connection');
 
+const users = db.get('users');
+
 let token;
 let userId;
 
-const users = db.get('users');
+const loginRoute = '/auth/login';
+const usersRoute = '/api/v1/users';
 
 const adminUser = {
   username: 'testAdmin',
@@ -41,12 +44,12 @@ const createAdminUser = async () => {
   }
 };
 
-describe('POST /auth/users', () => {
+describe(`POST ${loginRoute}`, () => {
   it('should login as admin user', async () => {
     await createAdminUser();
 
     const response = await request(app)
-      .post('/auth/login')
+      .post(loginRoute)
       .send(adminUser)
       .expect(200);
 
@@ -56,16 +59,16 @@ describe('POST /auth/users', () => {
   });
 });
 
-describe('GET /api/v1/users', () => {
+describe(`GET ${usersRoute}`, () => {
   it('should only allow admins to visit all users', async () => {
-    const response = await request(app).get('/api/v1/users').expect(401);
+    const response = await request(app).get(usersRoute).expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
   });
 
   it('should only allow admins to visit all users', async () => {
     const response = await request(app)
-      .get('/api/v1/users')
+      .get(usersRoute)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
@@ -73,16 +76,16 @@ describe('GET /api/v1/users', () => {
   });
 });
 
-describe('POST /api/v1/users', () => {
+describe(`POST ${usersRoute}`, () => {
   it('should only allow admins to create users', async () => {
-    const response = await request(app).post('/api/v1/users').expect(401);
+    const response = await request(app).post(usersRoute).expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
   });
 
   it('should require a username', async () => {
     const response = await request(app)
-      .post('/api/v1/users')
+      .post(usersRoute)
       .send({ password: newUser.password })
       .set('Authorization', `Bearer ${token}`)
       .expect(422);
@@ -92,7 +95,7 @@ describe('POST /api/v1/users', () => {
 
   it('should require a password', async () => {
     const response = await request(app)
-      .post('/api/v1/users')
+      .post(usersRoute)
       .send({ username: newUser.username })
       .set('Authorization', `Bearer ${token}`)
       .expect(422);
@@ -102,7 +105,7 @@ describe('POST /api/v1/users', () => {
 
   it('should only allow admins to create users', async () => {
     const response = await request(app)
-      .post('/api/v1/users')
+      .post(usersRoute)
       .send(newUser)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
@@ -114,7 +117,7 @@ describe('POST /api/v1/users', () => {
 
   it('should be a unique username', async () => {
     const response = await request(app)
-      .post('/api/v1/users')
+      .post(usersRoute)
       .send(newUser)
       .set('Authorization', `Bearer ${token}`)
       .expect(409);
@@ -125,16 +128,16 @@ describe('POST /api/v1/users', () => {
   });
 });
 
-describe('PATCH /api/v1/users', () => {
+describe(`PATCH ${usersRoute}`, () => {
   it('should only allow admin users to update users', async () => {
-    const response = await request(app).patch('/api/v1/users').expect(401);
+    const response = await request(app).patch(usersRoute).expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
   });
 
   it('should require a username / password / role / active property', async () => {
     const response = await request(app)
-      .patch(`/api/v1/users/${userId}`)
+      .patch(`${usersRoute}/${userId}`)
       .send({})
       .set('Authorization', `Bearer ${token}`)
       .expect(422);
@@ -146,7 +149,7 @@ describe('PATCH /api/v1/users', () => {
 
   it('should update the user', async () => {
     const response = await request(app)
-      .patch(`/api/v1/users/${userId}`)
+      .patch(`${usersRoute}/${userId}`)
       .send({ active: false })
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
@@ -157,14 +160,14 @@ describe('PATCH /api/v1/users', () => {
 
 describe('DELETE /api/v1/users', () => {
   it('should only allow admin users to delete users', async () => {
-    const response = await request(app).patch('/api/v1/users').expect(401);
+    const response = await request(app).patch(usersRoute).expect(401);
 
     expect(response.body.message).to.equal('Un-Authorized request');
   });
 
   it('should delete the user', async () => {
     const response = await request(app)
-      .delete(`/api/v1/users/${userId}`)
+      .delete(`${usersRoute}/${userId}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
