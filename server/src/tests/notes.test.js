@@ -41,6 +41,12 @@ describe('POST /auth/signup', () => {
 });
 
 describe('POST /api/v1/notes', () => {
+  it('should only allow logged in users to create notes', async () => {
+    const response = await request(app).post('/api/v1/notes').expect(401);
+
+    expect(response.body.message).to.equal('Un-Authorized request');
+  });
+
   it('should require a title', async () => {
     const response = await request(app)
       .post('/api/v1/notes')
@@ -92,6 +98,14 @@ describe('GET /api/v1/notes/', () => {
 });
 
 describe('PATCH /api/v1/notes', () => {
+  it('should only allow logged in users to update notes', async () => {
+    const response = await request(app)
+      .patch(`/api/v1/notes/${noteId}`)
+      .expect(401);
+
+    expect(response.body.message).to.equal('Un-Authorized request');
+  });
+
   it('should require title / note / reminder', async () => {
     const response = await request(app)
       .patch(`/api/v1/notes/${noteId}`)
@@ -136,6 +150,14 @@ describe('PATCH /api/v1/notes', () => {
 });
 
 describe('DELETE /api/v1/notes', () => {
+  it('should only allow logged in users to delete notes', async () => {
+    const response = await request(app)
+      .delete(`/api/v1/notes/${noteId}`)
+      .expect(401);
+
+    expect(response.body.message).to.equal('Un-Authorized request');
+  });
+
   it('should delete the test note', async () => {
     const response = await request(app)
       .delete(`/api/v1/notes/${noteId}`)

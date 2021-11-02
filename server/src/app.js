@@ -4,6 +4,8 @@ const cors = require('cors');
 const volleyball = require('volleyball');
 const rateLimit = require('express-rate-limit');
 
+// ? todo routes folder
+
 const auth = require('./auth/auth.routes');
 const notes = require('./api/v1/notes/notes.routes');
 const users = require('./api/v1/users/users');

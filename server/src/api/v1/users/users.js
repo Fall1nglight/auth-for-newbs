@@ -39,30 +39,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.patch('/:id', async (req, res, next) => {
-  try {
-    const {
-      body,
-      params: { id: _id },
-    } = req;
-
-    await updateSchema.validateAsync(body);
-
-    if (body.password) {
-      body.password = await bcrypt.hash(body.password, 12);
-    }
-
-    const updatedUser = await users.findOneAndUpdate(
-      { _id },
-      { $set: { ...body, updatedAt: new Date().getTime() } }
-    );
-
-    res.json({ updatedUser });
-  } catch (error) {
-    next(error);
-  }
-});
-
 router.post('/', async (req, res, next) => {
   try {
     const {
@@ -89,6 +65,30 @@ router.post('/', async (req, res, next) => {
       throw new Error('Failed to insert user. Please try again later.');
 
     res.json({ insertedUser });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch('/:id', async (req, res, next) => {
+  try {
+    const {
+      body,
+      params: { id: _id },
+    } = req;
+
+    await updateSchema.validateAsync(body);
+
+    if (body.password) {
+      body.password = await bcrypt.hash(body.password, 12);
+    }
+
+    const updatedUser = await users.findOneAndUpdate(
+      { _id },
+      { $set: { ...body, updatedAt: new Date().getTime() } }
+    );
+
+    res.json({ updatedUser });
   } catch (error) {
     next(error);
   }
