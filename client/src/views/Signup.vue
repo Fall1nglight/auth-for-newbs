@@ -73,8 +73,10 @@ import { useRouter } from 'vue-router';
 
 import Joi from 'joi';
 import { passwordStrength } from 'check-password-strength';
+import { useGetters, useActions } from '../helpers';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
+import { useStore } from 'vuex';
 
 const schema = Joi.object({
   username: Joi.string()
@@ -105,6 +107,8 @@ export default {
   },
 
   setup() {
+    const store = useStore();
+
     // router
     const router = useRouter();
 
@@ -134,22 +138,27 @@ export default {
 
       if (await validUser()) {
         try {
-          const response = await fetch(API_URl, {
-            method: 'POST',
-            body: JSON.stringify({
-              username: user.value.username,
-              password: user.value.password,
-            }),
-            headers: {
-              'Content-type': 'application/json',
-            },
-          });
+          // const { signup } = useActions(['signup']);
 
-          const result = await response.json();
-          if (!response.ok) throw new Error(result.message);
+          // signup(user.value);
 
-          localStorage.token = result.token;
-          router.push({ path: 'dashboard' });
+          store.dispatch('signup', user.value);
+
+          //* uses has entered valid information
+          // const response = await fetch(API_URl, {
+          //   method: 'POST',
+          //   body: JSON.stringify({
+          //     username: user.value.username,
+          //     password: user.value.password,
+          //   }),
+          //   headers: {
+          //     'Content-type': 'application/json',
+          //   },
+          // });
+          // const result = await response.json();
+          // if (!response.ok) throw new Error(result.message);
+          // localStorage.token = result.token;
+          // router.push({ path: 'dashboard' });
         } catch (error) {
           setDisplayMessage(error.message, msgTypes.error);
         }
@@ -160,6 +169,7 @@ export default {
       try {
         await schema.validateAsync(user.value);
 
+        // todo | do this with Joi
         if (user.value.password !== user.value.confirmPassword) {
           setDisplayMessage('Passwords must match.', msgTypes.error);
           return false;

@@ -1,5 +1,17 @@
 import axios from 'axios';
 
+import config from '../../config';
+
+// todo create axios instance
+// todo revise vuex
+// todo add signup, login actions
+// todo store user data inside vuex
+
+const request = axios.create({
+  baseURL: `${config.auth.url}`,
+  timeout: 5000,
+});
+
 const state = {
   authToken: '',
 };
@@ -11,10 +23,16 @@ const getters = {
 const actions = {
   signup: async ({ commit }, user) => {
     try {
-      // todo create axios instance
-      // todo revise vuex
-      // todo add signup, login actions
-      // todo store user data inside vuex
+      // todo | find a cleaner way to do this
+      const { username, password } = user;
+
+      console.log(user);
+      const { data: response } = await request.post('/signup', {
+        username,
+        password,
+      });
+
+      commit('setAuthToken', response.token);
     } catch (error) {
       console.error(error);
     }
