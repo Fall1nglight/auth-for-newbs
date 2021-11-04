@@ -2,9 +2,11 @@ const rateLimit = require('express-rate-limit');
 
 const rateLimitFns = require('../ratelimit/functions');
 
+// ! remove max: 0 after testing
+
 const signup = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 5,
+  max: 0,
   message:
     'Too many accounts created from this IP, please try again after an hour.',
 
@@ -13,7 +15,7 @@ const signup = rateLimit({
 
 const login = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 10,
+  max: 0,
   message:
     'Too many login attempts from this IP, please try again after 5 minutes.',
 

@@ -2,10 +2,21 @@ import axios from 'axios';
 
 import config from '../../config';
 
-// todo create axios instance
-// todo revise vuex
-// todo add signup, login actions
-// todo store user data inside vuex
+// gondolatmenet
+// ellenőrizzük az adatokat, ha helyes meghívjuk a signup-ot
+// a store-ban
+// ha sikeres a regisztráció visszakapunk egy JWT-t és
+// beállítjuk a state.authToken-re
+
+// az authTokent alapból a localStorage-ből olvassuk ki
+// de ha nem állítjuk be, akkor gond van
+
+// ha signup/login után beállíjuk a localStorage.token-t is
+// akkor megoldódik a probléma
+
+// ? mi van akkor ha módosítják a localStorage.token-t ?
+// ? mikor kell meghívni a checkUser-t
+// ! login és signup után commit('checkUser'), a state.user miatt
 
 const request = axios.create({
   baseURL: `${config.auth.url}`,
@@ -13,34 +24,62 @@ const request = axios.create({
 });
 
 const state = {
-  authToken: '',
+  authToken: localStorage.token || '',
+  user: '',
+  errorMessage: '',
 };
 
 const getters = {
   getAuthToken: (state) => state.authToken,
+
+  // ! state.user
+  isLoggedIn: (state) => !!state.user,
 };
 
 const actions = {
-  signup: async ({ commit }, user) => {
+  checkUser: async ({ commit }, token) => {
     try {
-      // todo | find a cleaner way to do this
-      const { username, password } = user;
+      console.log('incoming token:', token);
 
-      console.log(user);
+      const { data: response } = await request.get('/checkuser', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      commit('setUser', response.user);
+    } catch ({
+      response: {
+        data: { message },
+      },
+    }) {
+      commit('setErrorMessage', message);
+    }
+  },
+
+  signup: async ({ commit }, { username, password }) => {
+    try {
       const { data: response } = await request.post('/signup', {
         username,
         password,
       });
 
       commit('setAuthToken', response.token);
-    } catch (error) {
-      console.error(error);
+    } catch ({
+      response: {
+        data: { message },
+      },
+    }) {
+      commit('setErrorMessage', message);
     }
   },
 };
 
 const mutations = {
-  setAuthToken: (state, token) => (state.authToken = token),
+  setAuthToken: (state, token) => {
+    state.authToken = token;
+    localStorage.token = token;
+  },
+  setUser: (state, user) => (state.user = user),
+  setErrorMessage: (state, message) => (state.errorMessage = message),
 };
 
 export default {

@@ -107,7 +107,17 @@ export default {
   },
 
   setup() {
+    //store
     const store = useStore();
+
+    //other store items
+    const { signup: storeSignup } = useActions(['signup']);
+    const { getAuthToken: authToken, isLoggedIn } = useGetters([
+      'getAuthToken',
+      'isLoggedIn',
+    ]);
+
+    console.log(isLoggedIn.value);
 
     // router
     const router = useRouter();
@@ -138,27 +148,8 @@ export default {
 
       if (await validUser()) {
         try {
-          // const { signup } = useActions(['signup']);
-
-          // signup(user.value);
-
-          store.dispatch('signup', user.value);
-
-          //* uses has entered valid information
-          // const response = await fetch(API_URl, {
-          //   method: 'POST',
-          //   body: JSON.stringify({
-          //     username: user.value.username,
-          //     password: user.value.password,
-          //   }),
-          //   headers: {
-          //     'Content-type': 'application/json',
-          //   },
-          // });
-          // const result = await response.json();
-          // if (!response.ok) throw new Error(result.message);
-          // localStorage.token = result.token;
-          // router.push({ path: 'dashboard' });
+          // commit action to vuex store
+          storeSignup(user.value);
         } catch (error) {
           setDisplayMessage(error.message, msgTypes.error);
         }

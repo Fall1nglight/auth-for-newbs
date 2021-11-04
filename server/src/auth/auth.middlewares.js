@@ -10,10 +10,12 @@ const unAuthorized = (res, next) => {
 };
 
 const checkTokenSetUser = (req, res, next) => {
-  const authHeader = req.get('Authorization');
+  const {
+    headers: { authorization: authHeader },
+  } = req;
   if (!authHeader) return next();
 
-  const token = authHeader.split('Bearer ')[1];
+  const [, token] = authHeader.split(' ');
   if (!token) return next();
 
   jwt.verify(token, process.env.TOKEN_SECRET, (error, user) => {

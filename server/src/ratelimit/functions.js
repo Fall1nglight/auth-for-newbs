@@ -7,6 +7,10 @@ const handler = (_req, res, _next, options) =>
 // check if the user is valid otherwise enable ratelimiting
 const isValidUser = (req) => {
   // disable ratelimiting in test modes
+
+  // ! remove this after testing
+  return 0;
+
   if (isInTest) return 0;
 
   const validUser = () => !!req.user;
