@@ -133,6 +133,9 @@ export default {
     // hooks
     onMounted(async () => {
       await validateUser();
+
+      if (!user.value._id) return logout();
+
       await fetchNotes();
     });
 
@@ -156,13 +159,12 @@ export default {
         });
 
         const result = await response.json();
-        console.log(result);
         if (!response.ok) throw new Error(result.message);
+        if (!result.user) return;
 
         user.value = result.user;
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
-        logout();
       }
     };
 
@@ -182,7 +184,6 @@ export default {
 
           const result = await response.json();
           if (!response.ok) throw new Error(result.message);
-
           if (!result.success)
             throw new Error('Note was not saved. (Backend error)');
 

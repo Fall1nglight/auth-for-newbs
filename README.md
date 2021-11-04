@@ -2,6 +2,15 @@
 
 Add JWT-based authentication to a Node/Express/Mongo app.
 
+## Todo
+
+- [ ] Refactor client-side
+  - [ ] Use axios instead of fetch
+  - [ ] Use Vuex
+    - [ ] Create different stores
+      - [ ] Auth & User
+      - [ ] Notes
+
 ## Authentication
 
 - [ ] If logged in:
