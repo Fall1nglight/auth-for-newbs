@@ -7,6 +7,7 @@ import config from '../../config';
 // a store-ban
 // ha sikeres a regisztráció visszakapunk egy JWT-t és
 // beállítjuk a state.authToken-re
+// ! login és signup után commit('checkUser'), a state.user miatt
 
 // az authTokent alapból a localStorage-ből olvassuk ki
 // de ha nem állítjuk be, akkor gond van
@@ -16,7 +17,14 @@ import config from '../../config';
 
 // ? mi van akkor ha módosítják a localStorage.token-t ?
 // ? mikor kell meghívni a checkUser-t
-// ! login és signup után commit('checkUser'), a state.user miatt
+// ha checkUser nem volt sikeres -> state.user = '' / null
+
+// ha /dashboard előtt mindig meghívjuk a checkUser-t
+// akkor a ratelimiter le fog tiltani
+
+// ? hasAuthToken getter
+// ? ha van true, akkor továbbenged, ha nem, akkor /login-ra irányít
+// ? komponensenként kell azonosítani a felhasználót
 
 const request = axios.create({
   baseURL: `${config.auth.url}`,
@@ -31,18 +39,17 @@ const state = {
 
 const getters = {
   getAuthToken: (state) => state.authToken,
-
-  // ! state.user
   isLoggedIn: (state) => !!state.user,
+  hasAuthToken: (state) => !!state.authToken,
 };
 
 const actions = {
-  checkUser: async ({ commit }, token) => {
+  checkUser: async ({ commit, getters }) => {
     try {
-      console.log('incoming token:', token);
+      console.log('incoming token:', getters.getAuthToken);
 
       const { data: response } = await request.get('/checkuser', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${getters.getAuthToken}` },
       });
 
       commit('setUser', response.user);
@@ -55,14 +62,31 @@ const actions = {
     }
   },
 
-  signup: async ({ commit }, { username, password }) => {
+  signup: async ({ commit, dispatch }, { username, password }) => {
     try {
       const { data: response } = await request.post('/signup', {
         username,
         password,
       });
 
+      // ha meghívjuk a checkUser-t előtte be kell állítani a token
       commit('setAuthToken', response.token);
+      dispatch('checkUser');
+    } catch ({
+      response: {
+        data: { message },
+      },
+    }) {
+      commit('setErrorMessage', message);
+    }
+  },
+
+  login: async ({ commit, dispatch }, user) => {
+    try {
+      const { data: response } = await request.post('/login', user);
+
+      commit('setAuthToken', response.token);
+      dispatch('checkUser');
     } catch ({
       response: {
         data: { message },

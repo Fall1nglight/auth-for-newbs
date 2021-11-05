@@ -107,17 +107,12 @@ export default {
   },
 
   setup() {
-    //store
-    const store = useStore();
-
-    //other store items
+    //vuex items
     const { signup: storeSignup } = useActions(['signup']);
     const { getAuthToken: authToken, isLoggedIn } = useGetters([
       'getAuthToken',
       'isLoggedIn',
     ]);
-
-    console.log(isLoggedIn.value);
 
     // router
     const router = useRouter();
@@ -150,6 +145,7 @@ export default {
         try {
           // commit action to vuex store
           storeSignup(user.value);
+          router.push({ path: 'dashboard' });
         } catch (error) {
           setDisplayMessage(error.message, msgTypes.error);
         }

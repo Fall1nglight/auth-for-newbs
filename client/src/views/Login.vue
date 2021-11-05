@@ -51,6 +51,7 @@
 <script>
 import { inject, watch, ref } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
+import { useActions } from '../helpers';
 import Joi from 'joi';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
@@ -78,6 +79,9 @@ export default {
   },
 
   setup() {
+    // vuex items
+    const { login } = useActions(['login']);
+
     // router
     const router = useRouter();
 
@@ -106,22 +110,21 @@ export default {
 
       if (await validUser()) {
         try {
-          const response = await fetch(API_URl, {
-            method: 'POST',
-            body: JSON.stringify({
-              username: user.value.username,
-              password: user.value.password,
-            }),
-            headers: {
-              'Content-type': 'application/json',
-            },
-          });
-
-          const result = await response.json();
-          if (!response.ok) throw new Error(result.message);
-
-          localStorage.token = result.token;
-          router.push({ path: 'dashboard' });
+          login(user.value);
+          // const response = await fetch(API_URl, {
+          //   method: 'POST',
+          //   body: JSON.stringify({
+          //     username: user.value.username,
+          //     password: user.value.password,
+          //   }),
+          //   headers: {
+          //     'Content-type': 'application/json',
+          //   },
+          // });
+          // const result = await response.json();
+          // if (!response.ok) throw new Error(result.message);
+          // localStorage.token = result.token;
+          // router.push({ path: 'dashboard' });
         } catch (error) {
           setDisplayMessage(error.message, msgTypes.error);
         }

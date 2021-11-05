@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useGetters } from '../helpers';
 import { computed, watch } from '@vue/runtime-core';
 
 import store from '../store';
@@ -13,26 +12,21 @@ import NotFoundPage from '../views/NotFoundPage.vue';
 
 const authToken = computed(() => store.getters.getAuthToken);
 const isLoggedInStore = computed(() => store.getters.isLoggedIn);
+const checkUser = () => store.dispatch('checkUser');
 
 const loggedInRedirectDashboard = (to, from) => {
-  if (isLoggedInStore) return '/dashboard';
+  if (isLoggedInStore.value) return '/dashboard';
 };
 
 const isLoggedIn = (to, from) => {
-  // ? do i need this?
-  // store.commit('setAuthTokenFromLocalStorage');
-
-  // ? watch
-  watch(isLoggedInStore, () => {
-    console.log('fos');
-  });
-
-  if (!isLoggedInStore.value) {
-    // store.dispatch('checkUser', )
-  }
-
-  // if (!isLoggedInStore) return '/login';
-  // store.dispatch('checkUser', authToken.value);
+  // if the user is logged in forward
+  // if (isLoggedInStore.value) return to.path;
+  // if (authToken.value) {
+  //   checkUser();
+  //   watch(isLoggedInStore.value, () => {
+  //     return isLoggedInStore.value ? to.path : false;
+  //   });
+  // }
 };
 
 const routes = [
