@@ -16,7 +16,7 @@
             ><i class="bi bi-wrench text-warning"></i
           ></a>
 
-          <a @click="deleteNote(note)"
+          <a @click="deleteNote(note._id)"
             ><i class="bi bi-x-lg text-danger"></i
           ></a>
         </div>
@@ -86,9 +86,10 @@ export default {
 
   setup(props) {
     //vuex
-    const { updateReminder: updateReminderStore } = useActions([
-      'updateReminder',
-    ]);
+    const {
+      updateReminder: updateReminderStore,
+      deleteNote: deleteNoteStore,
+    } = useActions(['updateReminder', 'deleteNote']);
 
     // refs | local state
     const newNote = ref({
@@ -147,26 +148,11 @@ export default {
       }
     };
 
-    const deleteNote = async () => {
+    const deleteNote = async (id) => {
       if (!confirm('Are you sure you want to delete this note?')) return;
 
       try {
-        const { _id: id } = noteToUpdate;
-        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        if (!result.success)
-          throw new Error(
-            'Failed to delete note. Please try again later. (Backend error)'
-          );
-
-        // await fetchNotes();
+        await deleteNoteStore(id);
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }

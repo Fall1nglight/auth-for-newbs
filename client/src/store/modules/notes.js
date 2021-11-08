@@ -53,6 +53,7 @@ const actions = {
     }
   },
 
+  // reuse this method as backedn is capable of this
   updateReminder: async ({ commit, rootState }, note) => {
     try {
       const { _id: id, reminder: reminderValue } = note;
@@ -69,7 +70,25 @@ const actions = {
         }
       );
 
-      console.log(response);
+      commit('editNote', response.updatedNote);
+    } catch ({
+      response: {
+        data: { message },
+      },
+    }) {
+      commit('setErrorMessage', message);
+    }
+  },
+
+  deleteNote: async ({ commit, rootState }, id) => {
+    try {
+      const { data: response } = await request.delete(`/notes/${id}`, {
+        headers: {
+          Authorization: `Bearer ${rootState.auth.authToken}`,
+        },
+      });
+
+      if (response.success) commit('deleteNote', id);
     } catch ({
       response: {
         data: { message },
@@ -83,6 +102,15 @@ const actions = {
 const mutations = {
   setNotes: (state, notes) => (state.notes = notes),
   addNote: (state, note) => state.notes.push(note),
+  editNote: (state, newNote) => {
+    state.notes = state.notes.map((note) =>
+      // if the requested note is found, update it else return the original note
+      note._id === newNote._id ? { ...state.note, ...newNote } : note
+    );
+  },
+  deleteNote: (state, id) => {
+    state.notes = state.notes.filter((note) => note._id !== id);
+  },
   setErrorMessage: (state, message) => (state.errorMessage = message),
 };
 
