@@ -28,7 +28,7 @@
       </div>
 
       <div v-if="editState" class="card-body">
-        <form @submit.prevent="editNote">
+        <form @submit.prevent="editNote(note._id)">
           <div class="mb-3">
             <input
               v-model="newNote.title"
@@ -87,9 +87,9 @@ export default {
   setup(props) {
     //vuex
     const {
-      updateReminder: updateReminderStore,
+      editNote: editNoteStore,
       deleteNote: deleteNoteStore,
-    } = useActions(['updateReminder', 'deleteNote']);
+    } = useActions(['editNote', 'deleteNote']);
 
     // refs | local state
     const newNote = ref({
@@ -110,39 +110,22 @@ export default {
       displayMsg.value.type = msgType || '';
     };
 
-    const updateReminder = async (note) => {
+    const updateReminder = async ({ _id: id, reminder }) => {
       try {
-        await updateReminderStore(note);
+        await editNoteStore({ id, reminder: !reminder });
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }
     };
 
-    const editNote = async () => {
+    const editNote = async (id) => {
       editState.value = false;
-
       try {
-        const { _id: id, title, note } = noteToUpdate;
-
-        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({
-            title: title,
-            note: note,
-          }),
-          headers: {
-            'Content-type': 'application/json',
-            Authorization: `Bearer ${localStorage.token}`,
-          },
+        await editNoteStore({
+          id,
+          title: newNote.value.title,
+          note: newNote.value.note,
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        if (!result.success)
-          throw new Error(
-            'Failed to update note. Please try again later. (Backend error)'
-          );
-
-        // await fetchNotes();
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }

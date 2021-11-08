@@ -19,7 +19,7 @@ const getters = {
 };
 
 const actions = {
-  checkUser: async ({ commit, state }) => {
+  checkUser: async ({ commit, dispatch, state }) => {
     try {
       console.log('incoming token:', state.authToken);
 
@@ -27,9 +27,8 @@ const actions = {
         headers: { Authorization: `Bearer ${state.authToken}` },
       });
 
-      if (!response.user) return commit('setAuthToken', '');
-
-      commit('setUser', response.user);
+      if (response.user) return commit('setUser', response.user);
+      dispatch('logout');
     } catch ({
       response: {
         data: { message },

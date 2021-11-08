@@ -33,8 +33,6 @@ const actions = {
     }
   },
 
-  fetchNote: async ({ commit }, id) => {},
-
   insertNote: async ({ commit, rootState }, note) => {
     try {
       const { data: response } = await request.post('/notes', note, {
@@ -53,16 +51,14 @@ const actions = {
     }
   },
 
-  // reuse this method as backedn is capable of this
-  updateReminder: async ({ commit, rootState }, note) => {
+  editNote: async ({ commit, rootState }, note) => {
     try {
-      const { _id: id, reminder: reminderValue } = note;
+      const { id } = note;
+      delete note.id;
 
       const { data: response } = await request.patch(
         `/notes/${id}`,
-        {
-          reminder: !reminderValue,
-        },
+        { ...note },
         {
           headers: {
             Authorization: `Bearer ${rootState.auth.authToken}`,
