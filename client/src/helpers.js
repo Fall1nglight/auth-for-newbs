@@ -1,9 +1,15 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 
-export function useState(arr) {
+export function useState(stateModule, arr) {
   const store = useStore();
-  const keypair = arr.map((s) => [s, computed(() => store.state[s])]);
+
+  const keypair = arr.map((s) => {
+    return stateModule
+      ? [s, computed(() => store.state[stateModule][s])]
+      : [s, computed(() => store.state[s])];
+  });
+
   return Object.fromEntries(keypair);
 }
 

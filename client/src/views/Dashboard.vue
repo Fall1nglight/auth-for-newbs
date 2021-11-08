@@ -63,17 +63,13 @@
     </div>
   </div>
 
-  <Notes
-    @toggleNoteReminder="toggleNoteReminder"
-    @editNote="editNote"
-    @deleteNote="deleteNote"
-    :notes="notes"
-  />
+  <Notes />
 </template>
 
 <script>
-import { inject, onMounted, ref, watch } from '@vue/runtime-core';
+import { inject, ref, watch } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
+import { useState, useGetters, useActions, useMutations } from '../helpers';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 import Notes from '../components/Notes.vue';
@@ -92,8 +88,6 @@ const schema = Joi.object({
     .required(),
 });
 
-const API_URL = 'http://localhost:5000';
-
 export default {
   name: 'Dashboard',
   components: {
@@ -102,26 +96,19 @@ export default {
   },
 
   setup() {
-    // router
-    const router = useRouter();
-
     // inject
     const msgTypes = inject('bootstrapTypes');
 
-    // refs
-    const user = ref({
-      _id: '',
-      exp: 0,
-      iat: 0,
-      username: '',
-    });
+    // vuex state
+    const { user } = useState('auth', ['user']);
+    const { notes } = useState('notes', ['notes']);
+    const { insertNote: insertNoteStore } = useActions(['insertNote']);
 
+    // refs | local state
     const newNote = ref({
       title: '',
       note: '',
     });
-
-    const notes = ref([]);
 
     const formVisibility = ref(false);
 
@@ -130,72 +117,16 @@ export default {
       type: '',
     });
 
-    // hooks
-    onMounted(async () => {
-      await validateUser();
-
-      if (!user.value._id) return logout();
-
-      await fetchNotes();
-    });
-
     // functions
     const setDisplayMessage = (msg, msgType) => {
       displayMsg.value.message = msg;
       displayMsg.value.type = msgType || '';
     };
 
-    const logout = () => {
-      localStorage.removeItem('token');
-      router.push({ path: 'login' });
-    };
-
-    const validateUser = async () => {
-      try {
-        const response = await fetch(`${API_URL}/auth/checkuser`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        if (!result.user) return;
-
-        user.value = result.user;
-      } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
-      }
-    };
-
-    const insertNote = async () => {
-      setDisplayMessage('');
-
-      if (await validNote()) {
-        try {
-          const response = await fetch(`${API_URL}/api/v1/notes`, {
-            method: 'POST',
-            body: JSON.stringify(newNote.value),
-            headers: {
-              'Content-type': 'application/json',
-              Authorization: `Bearer ${localStorage.token}`,
-            },
-          });
-
-          const result = await response.json();
-          if (!response.ok) throw new Error(result.message);
-          if (!result.success)
-            throw new Error('Note was not saved. (Backend error)');
-
-          formVisibility.value = false;
-          newNote.value.title = '';
-          newNote.value.note = '';
-
-          await fetchNotes();
-        } catch (error) {
-          setDisplayMessage(error.message, msgTypes.error);
-        }
-      }
+    const resetForm = () => {
+      newNote.value.title = '';
+      newNote.value.note = '';
+      formVisibility.value = false;
     };
 
     const validNote = async () => {
@@ -208,104 +139,16 @@ export default {
       }
     };
 
-    const fetchNotes = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/v1/notes`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
+    const insertNote = async () => {
+      setDisplayMessage('');
 
-        const result = await response.json();
-        if (!response.ok || !result.userNotes)
-          throw new Error('Could not fetch your notes. (Backend error)');
-
-        // * protect array from duplicates
-        notes.value = [];
-
-        result.userNotes.forEach((note) => {
-          notes.value.push(note);
-        });
-      } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
-      }
-    };
-
-    const toggleNoteReminder = async (noteToUpdate) => {
-      try {
-        const { _id: id, reminder } = noteToUpdate;
-
-        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ reminder: !reminder }),
-          headers: {
-            'Content-type': 'application/json',
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        if (!result.success)
-          return setDisplayMessage(
-            'Failed to update note. Please try again later. (Backend error)'
-          );
-
-        await fetchNotes();
-      } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
-      }
-    };
-
-    const editNote = async (noteToUpdate) => {
-      try {
-        const { _id: id, title, note } = noteToUpdate;
-
-        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({
-            title: title,
-            note: note,
-          }),
-          headers: {
-            'Content-type': 'application/json',
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        if (!result.success)
-          throw new Error(
-            'Failed to update note. Please try again later. (Backend error)'
-          );
-
-        await fetchNotes();
-      } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
-      }
-    };
-
-    const deleteNote = async (noteToUpdate) => {
-      if (!confirm('Are you sure you want to delete this note?')) return;
-
-      try {
-        const { _id: id } = noteToUpdate;
-        const response = await fetch(`${API_URL}/api/v1/notes/${id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-          },
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        if (!result.success)
-          throw new Error(
-            'Failed to delete note. Please try again later. (Backend error)'
-          );
-
-        await fetchNotes();
-      } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
+      if (await validNote()) {
+        try {
+          await insertNoteStore(newNote.value);
+          resetForm();
+        } catch (error) {
+          setDisplayMessage(error.message, msgTypes.error);
+        }
       }
     };
 
@@ -322,10 +165,6 @@ export default {
       notes,
       displayMsg,
       insertNote,
-      fetchNotes,
-      toggleNoteReminder,
-      editNote,
-      deleteNote,
     };
   },
 };

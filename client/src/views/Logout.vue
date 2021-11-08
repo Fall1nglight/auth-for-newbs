@@ -2,17 +2,21 @@
 
 <script>
 import { useRouter } from 'vue-router';
+import { useActions } from '../helpers';
 export default {
   name: 'Logout',
 
   setup() {
+    //vuex
+    const { logout: logoutAction } = useActions(['logout']);
+
     //router
     const router = useRouter();
 
     //function(s)
     const logout = () => {
-      if (localStorage.token) localStorage.removeItem('token');
-      router.push({ path: 'login' });
+      logoutAction();
+      router.push({ path: '/login' });
     };
 
     logout();

@@ -29,8 +29,9 @@ const post = async (req, res, next) => {
       userId,
     });
 
-    if (!newNote) return res.json({ success: false });
-    res.json({ success: true });
+    if (!newNote) throw new Error('Failed to insert node. (Backend error)');
+
+    res.json({ newNote });
   } catch (error) {
     respondWithError(res, next, error);
   }
@@ -51,8 +52,8 @@ const patch = async (req, res, next) => {
       }
     );
 
-    if (!updatedNote) return res.json({ success: false });
-    res.json({ success: true });
+    if (!updatedNote) throw new Error('Failed to update note. (Backend error)');
+    res.json({ updatedNote });
   } catch (error) {
     respondWithError(res, next, error);
   }

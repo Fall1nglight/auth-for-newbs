@@ -13,4 +13,5 @@ const api = {
 export default {
   auth,
   api,
+  baseUrl,
 };

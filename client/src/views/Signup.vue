@@ -73,10 +73,9 @@ import { useRouter } from 'vue-router';
 
 import Joi from 'joi';
 import { passwordStrength } from 'check-password-strength';
-import { useGetters, useActions } from '../helpers';
+import { useGetters, useActions, useState, useMutations } from '../helpers';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
-import { useStore } from 'vuex';
 
 const schema = Joi.object({
   username: Joi.string()
@@ -107,12 +106,10 @@ export default {
   },
 
   setup() {
-    //vuex items
+    //vuex
+    const { errorMessage } = useState('auth', ['errorMessage']);
     const { signup: storeSignup } = useActions(['signup']);
-    const { getAuthToken: authToken, isLoggedIn } = useGetters([
-      'getAuthToken',
-      'isLoggedIn',
-    ]);
+    const { setErrorMessage } = useMutations(['setErrorMessage']);
 
     // router
     const router = useRouter();
@@ -140,12 +137,15 @@ export default {
 
     const signup = async () => {
       setDisplayMessage('');
+      setErrorMessage('');
 
       if (await validUser()) {
         try {
-          // commit action to vuex store
-          storeSignup(user.value);
-          router.push({ path: 'dashboard' });
+          await storeSignup(user.value);
+
+          if (errorMessage.value) return;
+
+          router.push({ path: '/dashboard' });
         } catch (error) {
           setDisplayMessage(error.message, msgTypes.error);
         }
@@ -173,15 +173,20 @@ export default {
       }
     };
 
-    // watch
-    watch(user.value, () => {
-      setDisplayMessage('');
-    });
-
     //computed
     const pwdStrength = computed(() =>
       user.value.password ? passwordStrength(user.value.password).value : ''
     );
+
+    // watch
+    watch(user.value, () => {
+      setDisplayMessage('');
+      setErrorMessage('');
+    });
+
+    watch(errorMessage, () => {
+      setDisplayMessage(errorMessage.value, msgTypes.error);
+    });
 
     // expose
     return { user, signup, displayMsg, pwdStrength };

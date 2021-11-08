@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { computed, watch } from '@vue/runtime-core';
+import { computed } from '@vue/runtime-core';
 
 import store from '../store';
 
@@ -10,24 +10,24 @@ import Dashboard from '../views/Dashboard.vue';
 import Logout from '../views/Logout.vue';
 import NotFoundPage from '../views/NotFoundPage.vue';
 
-const authToken = computed(() => store.getters.getAuthToken);
-const isLoggedInStore = computed(() => store.getters.isLoggedIn);
+const authToken = computed(() => store.state.auth.authToken);
+const isLoggedIn = computed(() => store.getters.isLoggedIn);
 const checkUser = () => store.dispatch('checkUser');
+const fetchNotes = () => store.dispatch('fetchNotes');
 
-const loggedInRedirectDashboard = (to, from) => {
-  if (isLoggedInStore.value) return '/dashboard';
+// todo | make little middlewares from these functions
+const isLoggedInRedirectDashboard = async (to, from, next) => {
+  if (!authToken.value) return next({ path: '/login' });
+
+  // user has token, need to validate it
+  await checkUser();
+
+  //if the token was valid forward to /dashboard else to /login
+  return isLoggedIn.value ? next() : next({ path: '/login' });
 };
 
-const isLoggedIn = (to, from) => {
-  // if the user is logged in forward
-  // if (isLoggedInStore.value) return to.path;
-  // if (authToken.value) {
-  //   checkUser();
-  //   watch(isLoggedInStore.value, () => {
-  //     return isLoggedInStore.value ? to.path : false;
-  //   });
-  // }
-};
+const hasAuthToken = (to, from, next) =>
+  authToken.value ? next({ path: '/dashboard' }) : next();
 
 const routes = [
   {
@@ -39,25 +39,27 @@ const routes = [
     path: '/signup',
     name: 'Signup',
     component: Signup,
-    beforeEnter: loggedInRedirectDashboard,
+    beforeEnter: hasAuthToken,
   },
   {
     path: '/login',
     name: 'Login',
     component: Login,
-    beforeEnter: loggedInRedirectDashboard,
+    beforeEnter: hasAuthToken,
   },
   {
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-    beforeEnter: isLoggedIn,
+    beforeEnter: [isLoggedInRedirectDashboard, fetchNotes],
   },
   {
     path: '/logout',
     name: 'Logout',
     component: Logout,
-    beforeEnter: isLoggedIn,
+    beforeEnter: (to, from, next) => {
+      if (authToken.value) return next();
+    },
   },
   {
     path: '/:pathMatch(.*)*',
