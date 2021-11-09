@@ -59,10 +59,10 @@
 
       <div class="card-footer">
         <small class="text-muted d-flex w-100"
-          >Created {{ formatDate(createdAt) }} ago</small
+          >Created {{ formatDate(note.createdAt) }} ago</small
         >
-        <small v-if="updatedAt" class="text-muted"
-          >Last updated {{ formatDate(updatedAt) }} ago</small
+        <small v-if="note.updatedAt" class="text-muted"
+          >Last updated {{ formatDate(note.updatedAt) }} ago</small
         >
       </div>
     </div>
@@ -70,13 +70,9 @@
 </template>
 
 <script>
-import { ref, computed } from '@vue/reactivity';
+import { ref } from '@vue/reactivity';
+import { useActions } from '../helpers';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import { useState, useGetters, useActions, useMutations } from '../helpers';
-
-import config from '../config';
-
-const API_URL = config.baseUrl;
 
 export default {
   name: 'Note',
@@ -85,7 +81,7 @@ export default {
   },
 
   setup(props) {
-    //vuex
+    // vuex
     const {
       editNote: editNoteStore,
       deleteNote: deleteNoteStore,
@@ -120,6 +116,7 @@ export default {
 
     const editNote = async (id) => {
       editState.value = false;
+
       try {
         await editNoteStore({
           id,
@@ -143,17 +140,10 @@ export default {
 
     const formatDate = (date) => formatDistanceToNow(new Date(date));
 
-    //computed
-    // ! remove this -> use note.createdAt inside template
-    const createdAt = computed(() => props.note.createdAt);
-    const updatedAt = computed(() => props.note.updatedAt);
-
     // expose
     return {
       newNote,
       editState,
-      createdAt,
-      updatedAt,
       formatDate,
       updateReminder,
       editNote,
