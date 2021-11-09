@@ -15,7 +15,7 @@
     </div>
 
     <div class="col-md-5">
-      <DisplayMessage :messageObj="displayMsg" />
+      <DisplayMessage :message="message" />
 
       <div class="form-check form-switch" id="switchButton">
         <input
@@ -68,13 +68,13 @@
 
 <script>
 import { inject, ref, watch } from '@vue/runtime-core';
-import { useRouter } from 'vue-router';
-import { useState, useGetters, useActions, useMutations } from '../helpers';
+import Joi from 'joi';
+
+import { useState, useActions } from '../helpers';
+import useDisplayMessage from '../composables/useDisplayMessage';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 import Notes from '../components/Notes.vue';
-
-import Joi from 'joi';
 
 const schema = Joi.object({
   title: Joi.string()
@@ -96,10 +96,10 @@ export default {
   },
 
   setup() {
-    // inject
-    const msgTypes = inject('bootstrapTypes');
+    // composables
+    const { msgTypes, message, setDisplayMessage } = useDisplayMessage();
 
-    // vuex state
+    // vuex
     const { user } = useState('auth', ['user']);
     const { notes } = useState('notes', ['notes']);
     const { insertNote: insertNoteStore } = useActions(['insertNote']);
@@ -112,17 +112,7 @@ export default {
 
     const formVisibility = ref(false);
 
-    const displayMsg = ref({
-      message: '',
-      type: '',
-    });
-
     // functions
-    const setDisplayMessage = (msg, msgType) => {
-      displayMsg.value.message = msg;
-      displayMsg.value.type = msgType || '';
-    };
-
     const resetForm = () => {
       newNote.value.title = '';
       newNote.value.note = '';
@@ -163,7 +153,7 @@ export default {
       newNote,
       formVisibility,
       notes,
-      displayMsg,
+      message,
       insertNote,
     };
   },

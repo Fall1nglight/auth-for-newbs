@@ -1,6 +1,6 @@
 <template>
-  <div v-if="messageObj.message" :class="['alert', activeClass]" role="alert">
-    {{ messageObj.message }}
+  <div v-if="message.message" :class="['alert', activeClass]" role="alert">
+    {{ message.message }}
   </div>
 </template>
 
@@ -10,12 +10,12 @@ import { computed } from '@vue/runtime-core';
 export default {
   name: 'DisplayMessage',
   props: {
-    messageObj: Object,
+    message: Object,
   },
 
   setup(props) {
     const activeClass = computed(() =>
-      props.messageObj.type ? `alert-${props.messageObj.type}` : 'alert-info'
+      props.message.type ? `alert-${props.message.type}` : 'alert-info'
     );
 
     return { activeClass };

@@ -71,8 +71,10 @@
 
 <script>
 import { ref } from '@vue/reactivity';
+
 import { useActions } from '../helpers';
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import useFormatDate from '../composables/useFormatDate';
+import useDisplayMessage from '../composables/useDisplayMessage';
 
 export default {
   name: 'Note',
@@ -81,6 +83,10 @@ export default {
   },
 
   setup(props) {
+    // composables
+    const { formatDate } = useFormatDate();
+    const { msgTypes, displayMessage, setDisplayMessage } = useDisplayMessage();
+
     // vuex
     const {
       editNote: editNoteStore,
@@ -95,17 +101,7 @@ export default {
 
     const editState = ref(false);
 
-    const displayMsg = ref({
-      message: '',
-      type: '',
-    });
-
     // functions
-    const setDisplayMessage = (msg, msgType) => {
-      displayMsg.value.message = msg;
-      displayMsg.value.type = msgType || '';
-    };
-
     const updateReminder = async ({ _id: id, reminder }) => {
       try {
         await editNoteStore({ id, reminder: !reminder });
@@ -137,8 +133,6 @@ export default {
         setDisplayMessage(error.message, msgTypes.error);
       }
     };
-
-    const formatDate = (date) => formatDistanceToNow(new Date(date));
 
     // expose
     return {
