@@ -51,7 +51,6 @@
 <script>
 import { watch, ref } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
-import Joi from 'joi';
 
 import { useActions, useMutations, useState } from '../helpers';
 import useDisplayMessage from '../composables/useDisplayMessage';

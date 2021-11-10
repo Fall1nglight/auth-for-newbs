@@ -67,8 +67,7 @@
 </template>
 
 <script>
-import { inject, ref, watch } from '@vue/runtime-core';
-import Joi from 'joi';
+import { ref, watch } from '@vue/runtime-core';
 
 import { useState, useActions } from '../helpers';
 import useDisplayMessage from '../composables/useDisplayMessage';

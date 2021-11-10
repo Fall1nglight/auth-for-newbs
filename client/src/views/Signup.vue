@@ -70,15 +70,13 @@
 <script>
 import { watch, ref, computed } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
-import Joi from 'joi';
 import { passwordStrength } from 'check-password-strength';
 
 import { useActions, useState, useMutations } from '../helpers';
 import useDisplayMessage from '../composables/useDisplayMessage';
+import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
-
-import schemas from '../config/schemas';
 
 export default {
   name: 'Signup',
