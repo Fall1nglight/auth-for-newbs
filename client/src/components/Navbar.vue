@@ -14,8 +14,11 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarColor01">
-        <ul class="navbar-nav ms-auto">
+      <div
+        class="collapse navbar-collapse justify-content-end"
+        id="navbarColor01"
+      >
+        <ul class="navbar-nav me-5">
           <li class="nav-item">
             <router-link to="/" class="nav-link">Homepage </router-link>
           </li>
@@ -34,8 +37,29 @@
             >
           </li>
 
-          <li v-if="!displayNavItems" class="nav-item">
-            <router-link to="/logout" class="nav-link">Logout</router-link>
+          <li v-show="user._id" class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {{ user.username }}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li v-show="isAdmin">
+                <router-link to="/admin-dashboard" class="dropdown-item">
+                  Admin Dashboard
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/logout" class="dropdown-item"
+                  >Logout</router-link
+                >
+              </li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -46,13 +70,20 @@
 <script>
 import { ref, watch } from '@vue/runtime-core';
 import { useRoute } from 'vue-router';
+import { useGetters, useState } from '../helpers';
 
 const protectedRoutes = ['/', '/login', '/signup'];
+
+// todo | refactor this mess
 
 export default {
   name: 'Navbar',
 
   setup() {
+    // vuex
+    const { user } = useState('auth', ['user']);
+    const { isAdmin } = useGetters(['isAdmin']);
+
     //route
     const route = useRoute();
 
@@ -73,7 +104,7 @@ export default {
       displayNavItems.value = false;
     });
 
-    return { displayNavItems };
+    return { displayNavItems, user, isAdmin };
   },
 };
 </script>

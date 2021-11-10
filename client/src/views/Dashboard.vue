@@ -2,16 +2,6 @@
   <div class="row mb-3 justify-content-between">
     <div class="col-md-5 text-black">
       <div class="h1">Dashboard</div>
-      <div class="h5">Welcome, {{ user.username }}</div>
-
-      <figure class="mt-4">
-        <blockquote class="blockquote">
-          <p>A well-known quote, contained in a blockquote element.</p>
-        </blockquote>
-        <figcaption class="blockquote-footer text-black">
-          Someone famous in <cite title="Source Title">Source Title</cite>
-        </figcaption>
-      </figure>
     </div>
 
     <div class="col-md-5">

@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { ref } from '@vue/reactivity';
+import { ref } from '@vue/runtime-core';
 
 import { useActions } from '../helpers';
 import useFormatDate from '../composables/useFormatDate';

@@ -15,6 +15,7 @@ const state = {
 
 const getters = {
   isLoggedIn: (state) => !!state.user._id,
+  isAdmin: (state) => (state.user.role === 'admin' ? true : false),
   getUserId: (state) => state.user._id,
 };
 

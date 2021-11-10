@@ -7,11 +7,13 @@ import Home from '../views/Home.vue';
 import Signup from '../views/Signup.vue';
 import Login from '../views/Login.vue';
 import Dashboard from '../views/Dashboard.vue';
+import AdminDashboard from '../views/AdminDashboard.vue';
 import Logout from '../views/Logout.vue';
 import NotFoundPage from '../views/NotFoundPage.vue';
 
 const authToken = computed(() => store.state.auth.authToken);
 const isLoggedIn = computed(() => store.getters.isLoggedIn);
+const isAdmin = computed(() => store.getters.isAdmin);
 const checkUser = () => store.dispatch('checkUser');
 const fetchNotes = () => store.dispatch('fetchNotes');
 
@@ -26,6 +28,9 @@ const isLoggedInRedirectDashboard = async (to, from, next) => {
   return isLoggedIn.value ? next() : next({ path: '/login' });
 };
 
+const checkAdmin = (to, from, next) =>
+  isAdmin.value ? next() : next({ path: '/dashboard' });
+
 const hasAuthToken = (to, from, next) =>
   authToken.value ? next({ path: '/dashboard' }) : next();
 
@@ -34,6 +39,10 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    // beforeEnter: async (to, from, next) => {
+    //   if (authToken.value) await checkUser();
+    //   next();
+    // },
   },
   {
     path: '/signup',
@@ -52,6 +61,12 @@ const routes = [
     name: 'Dashboard',
     component: Dashboard,
     beforeEnter: [isLoggedInRedirectDashboard, fetchNotes],
+  },
+  {
+    path: '/admin-dashboard',
+    name: 'AdminDashbiard',
+    component: AdminDashboard,
+    beforeEnter: [isLoggedInRedirectDashboard, checkAdmin, fetchNotes],
   },
   {
     path: '/logout',
