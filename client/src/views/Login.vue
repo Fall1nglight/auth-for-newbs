@@ -4,7 +4,7 @@
 
     <div class="row justify-content-md-center">
       <div class="col-md-5">
-        <DisplayMessage :messageObj="displayMsg" />
+        <DisplayMessage :message="message" />
       </div>
     </div>
 
@@ -49,28 +49,15 @@
 </template>
 
 <script>
-import { inject, watch, ref } from '@vue/runtime-core';
+import { watch, ref } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
-import { useActions, useGetters, useMutations, useState } from '../helpers';
 import Joi from 'joi';
 
+import { useActions, useMutations, useState } from '../helpers';
+import useDisplayMessage from '../composables/useDisplayMessage';
+import schemas from '../config/schemas';
+
 import DisplayMessage from '../components/DisplayMessage.vue';
-
-const schema = Joi.object({
-  username: Joi.string()
-    .regex(/(^[a-zA-Z0-9_]+$)/)
-    .min(2)
-    .max(30)
-    .required(),
-
-  password: Joi.string()
-    .regex(/^\S+$/)
-    .min(10)
-    .max(30)
-    .required(),
-});
-
-const API_URl = 'http://localhost:5000/auth/login';
 
 export default {
   name: 'Login',
@@ -79,6 +66,12 @@ export default {
   },
 
   setup() {
+    // composables
+    const { msgTypes, message, setDisplayMessage } = useDisplayMessage();
+
+    // schemas
+    const { login: schema } = schemas.auth;
+
     // vuex items
     const { errorMessage } = useState('auth', ['errorMessage']);
     const { login: loginStore } = useActions(['login']);
@@ -87,25 +80,13 @@ export default {
     // router
     const router = useRouter();
 
-    // inject
-    const msgTypes = inject('bootstrapTypes');
-
     // refs
     const user = ref({
       username: '',
       password: '',
     });
 
-    const displayMsg = ref({
-      message: '',
-      type: '',
-    });
     // functions
-    const setDisplayMessage = (msg, msgType) => {
-      displayMsg.value.message = msg;
-      displayMsg.value.type = msgType || '';
-    };
-
     const login = async () => {
       setErrorMessage('');
       setDisplayMessage('');
@@ -148,7 +129,7 @@ export default {
     });
 
     // expose
-    return { user, login, displayMsg };
+    return { user, login, message };
   },
 };
 </script>

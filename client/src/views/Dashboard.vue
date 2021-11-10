@@ -72,21 +72,10 @@ import Joi from 'joi';
 
 import { useState, useActions } from '../helpers';
 import useDisplayMessage from '../composables/useDisplayMessage';
+import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 import Notes from '../components/Notes.vue';
-
-const schema = Joi.object({
-  title: Joi.string()
-    .min(2)
-    .max(30)
-    .required(),
-
-  note: Joi.string()
-    .min(2)
-    .max(450)
-    .required(),
-});
 
 export default {
   name: 'Dashboard',
@@ -98,6 +87,9 @@ export default {
   setup() {
     // composables
     const { msgTypes, message, setDisplayMessage } = useDisplayMessage();
+
+    // schemas
+    const { insert: schema } = schemas.note;
 
     // vuex
     const { user } = useState('auth', ['user']);

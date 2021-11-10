@@ -4,7 +4,7 @@
 
     <div class="row justify-content-md-center">
       <div class="col-md-10 col-lg-6">
-        <DisplayMessage :messageObj="displayMsg" />
+        <DisplayMessage :message="message" />
       </div>
     </div>
 
@@ -68,36 +68,17 @@
 </template>
 
 <script>
-import { inject, watch, ref, computed } from '@vue/runtime-core';
+import { watch, ref, computed } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
-
 import Joi from 'joi';
 import { passwordStrength } from 'check-password-strength';
-import { useGetters, useActions, useState, useMutations } from '../helpers';
+
+import { useActions, useState, useMutations } from '../helpers';
+import useDisplayMessage from '../composables/useDisplayMessage';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 
-const schema = Joi.object({
-  username: Joi.string()
-    .regex(/(^[a-zA-Z0-9_]+$)/)
-    .min(2)
-    .max(30)
-    .required(),
-
-  password: Joi.string()
-    .regex(/^\S+$/)
-    .min(10)
-    .max(30)
-    .required(),
-
-  confirmPassword: Joi.string()
-    .regex(/^\S+$/)
-    .min(10)
-    .max(30)
-    .required(),
-});
-
-const API_URl = 'http://localhost:5000/auth/signup';
+import schemas from '../config/schemas';
 
 export default {
   name: 'Signup',
@@ -106,16 +87,19 @@ export default {
   },
 
   setup() {
-    //vuex
+    // composables
+    const { msgTypes, message, setDisplayMessage } = useDisplayMessage();
+
+    // schemas
+    const { signup: schema } = schemas.auth;
+
+    // vuex
     const { errorMessage } = useState('auth', ['errorMessage']);
     const { signup: storeSignup } = useActions(['signup']);
     const { setErrorMessage } = useMutations(['setErrorMessage']);
 
     // router
     const router = useRouter();
-
-    //inject
-    const msgTypes = inject('bootstrapTypes');
 
     // refs
     const user = ref({
@@ -124,17 +108,7 @@ export default {
       confirmPassword: '',
     });
 
-    const displayMsg = ref({
-      message: '',
-      type: '',
-    });
-
     // functions
-    const setDisplayMessage = (msg, msgType) => {
-      displayMsg.value.message = msg;
-      displayMsg.value.type = msgType || '';
-    };
-
     const signup = async () => {
       setDisplayMessage('');
       setErrorMessage('');
@@ -156,16 +130,12 @@ export default {
       try {
         await schema.validateAsync(user.value);
 
-        // todo | do this with Joi
-        if (user.value.password !== user.value.confirmPassword) {
-          setDisplayMessage('Passwords must match.', msgTypes.error);
-          return false;
-        }
-
         return true;
       } catch (error) {
         if (error.message.includes('username')) {
           setDisplayMessage('Username is invalid.', msgTypes.error);
+        } else if (error.message.includes('"Confirm Password"')) {
+          setDisplayMessage('Confirm password must match.', msgTypes.error);
         } else {
           setDisplayMessage('Password is invalid.', msgTypes.error);
         }
@@ -189,7 +159,7 @@ export default {
     });
 
     // expose
-    return { user, signup, displayMsg, pwdStrength };
+    return { user, signup, message, pwdStrength };
   },
 };
 </script>
