@@ -49,10 +49,10 @@
 </template>
 
 <script>
-import { watch, ref } from '@vue/runtime-core';
+import { watch, ref, computed } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
-import { useActions, useMutations, useState } from '../helpers';
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 
@@ -71,10 +71,14 @@ export default {
     // schemas
     const { login: schema } = schemas.auth;
 
+    // store
+    const store = useStore();
+
     // vuex items
-    const { errorMessage } = useState('auth', ['errorMessage']);
-    const { login: loginStore } = useActions(['login']);
-    const { setErrorMessage } = useMutations(['setErrorMessage']);
+    const errorMessage = computed(() => store.getters['auth/errorMessage']);
+    const loginAction = (payload) => store.dispatch('auth/login', payload);
+    const setErrorMessage = (message) =>
+      store.commit('auth/setErrorMessage', message);
 
     // router
     const router = useRouter();
@@ -92,7 +96,7 @@ export default {
 
       if (await validUser()) {
         try {
-          await loginStore(user.value);
+          await loginAction(user.value);
 
           if (errorMessage.value) return;
 

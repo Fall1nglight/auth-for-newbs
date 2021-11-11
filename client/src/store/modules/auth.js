@@ -14,9 +14,12 @@ const state = {
 };
 
 const getters = {
+  authToken: (state) => state.authToken,
+  user: (state) => state.user,
+  userId: (state) => state.user._id,
   isLoggedIn: (state) => !!state.user._id,
   isAdmin: (state) => (state.user.role === 'admin' ? true : false),
-  getUserId: (state) => state.user._id,
+  errorMessage: (state) => state.errorMessage,
 };
 
 const actions = {

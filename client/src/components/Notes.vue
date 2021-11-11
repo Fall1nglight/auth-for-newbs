@@ -5,8 +5,8 @@
 </template>
 
 <script>
-import { useState } from '../helpers';
-
+import { computed } from '@vue/reactivity';
+import { useStore } from 'vuex';
 import Note from './Note.vue';
 
 export default {
@@ -16,9 +16,11 @@ export default {
   },
 
   setup() {
-    // vuex state
-    const { notes } = useState('notes', ['notes']);
+    // store
+    const store = useStore();
 
+    // vuex state
+    const notes = computed(() => store.getters['notes/notes']);
     return { notes };
   },
 };

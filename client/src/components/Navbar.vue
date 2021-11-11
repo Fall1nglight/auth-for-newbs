@@ -68,9 +68,9 @@
 </template>
 
 <script>
-import { ref, watch } from '@vue/runtime-core';
+import { computed, ref, watch } from '@vue/runtime-core';
 import { useRoute } from 'vue-router';
-import { useGetters, useState } from '../helpers';
+import { useStore } from 'vuex';
 
 const protectedRoutes = ['/', '/login', '/signup'];
 
@@ -80,9 +80,12 @@ export default {
   name: 'Navbar',
 
   setup() {
+    // store
+    const store = useStore();
+
     // vuex
-    const { user } = useState('auth', ['user']);
-    const { isAdmin } = useGetters(['isAdmin']);
+    const user = computed(() => store.getters['auth/user']);
+    const isAdmin = computed(() => store.getters['auth/isAdmin']);
 
     //route
     const route = useRoute();

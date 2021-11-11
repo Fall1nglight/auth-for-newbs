@@ -12,14 +12,17 @@ const state = {
   errorMessage: '',
 };
 
-const getters = {};
+const getters = {
+  notes: (state) => state.notes,
+  errorMessage: (state) => state.errorMessage,
+};
 
 const actions = {
-  fetchNotes: async ({ commit, rootState }) => {
+  fetchNotes: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/notes', {
         headers: {
-          Authorization: `Bearer ${rootState.auth.authToken}`,
+          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
         },
       });
 
@@ -33,11 +36,11 @@ const actions = {
     }
   },
 
-  insertNote: async ({ commit, rootState }, note) => {
+  insertNote: async ({ commit, rootGetters }, note) => {
     try {
       const { data: response } = await request.post('/notes', note, {
         headers: {
-          Authorization: `Bearer ${rootState.auth.authToken}`,
+          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
         },
       });
 
@@ -51,7 +54,7 @@ const actions = {
     }
   },
 
-  editNote: async ({ commit, rootState }, note) => {
+  editNote: async ({ commit, rootGetters }, note) => {
     try {
       const { id } = note;
       delete note.id;
@@ -61,7 +64,7 @@ const actions = {
         { ...note },
         {
           headers: {
-            Authorization: `Bearer ${rootState.auth.authToken}`,
+            Authorization: `Bearer ${rootGetters['auth/authToken']}`,
           },
         }
       );
@@ -76,11 +79,11 @@ const actions = {
     }
   },
 
-  deleteNote: async ({ commit, rootState }, id) => {
+  deleteNote: async ({ commit, rootGetters }, id) => {
     try {
       const { data: response } = await request.delete(`/notes/${id}`, {
         headers: {
-          Authorization: `Bearer ${rootState.auth.authToken}`,
+          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
         },
       });
 

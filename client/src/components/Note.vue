@@ -71,8 +71,8 @@
 
 <script>
 import { ref } from '@vue/runtime-core';
+import { useStore } from 'vuex';
 
-import { useActions } from '../helpers';
 import useFormatDate from '../composables/useFormatDate';
 import useDisplayMessage from '../composables/useDisplayMessage';
 
@@ -87,11 +87,13 @@ export default {
     const { formatDate } = useFormatDate();
     const { msgTypes, displayMessage, setDisplayMessage } = useDisplayMessage();
 
+    // store
+    const store = useStore();
+
     // vuex
-    const {
-      editNote: editNoteStore,
-      deleteNote: deleteNoteStore,
-    } = useActions(['editNote', 'deleteNote']);
+    const editNoteAction = (payload) =>
+      store.dispatch('notes/editNote', payload);
+    const deleteNoteAction = (id) => store.dispatch('notes/deleteNote', id);
 
     // refs | local state
     const newNote = ref({
@@ -104,7 +106,7 @@ export default {
     // functions
     const updateReminder = async ({ _id: id, reminder }) => {
       try {
-        await editNoteStore({ id, reminder: !reminder });
+        await editNoteAction({ id, reminder: !reminder });
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }
@@ -114,7 +116,7 @@ export default {
       editState.value = false;
 
       try {
-        await editNoteStore({
+        await editNoteAction({
           id,
           title: newNote.value.title,
           note: newNote.value.note,
@@ -128,7 +130,7 @@ export default {
       if (!confirm('Are you sure you want to delete this note?')) return;
 
       try {
-        await deleteNoteStore(id);
+        await deleteNoteAction(id);
       } catch (error) {
         setDisplayMessage(error.message, msgTypes.error);
       }

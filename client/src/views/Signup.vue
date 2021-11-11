@@ -72,11 +72,11 @@ import { watch, ref, computed } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 import { passwordStrength } from 'check-password-strength';
 
-import { useActions, useState, useMutations } from '../helpers';
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
+import { useStore } from 'vuex';
 
 export default {
   name: 'Signup',
@@ -91,10 +91,14 @@ export default {
     // schemas
     const { signup: schema } = schemas.auth;
 
+    // store
+    const store = useStore();
+
     // vuex
-    const { errorMessage } = useState('auth', ['errorMessage']);
-    const { signup: storeSignup } = useActions(['signup']);
-    const { setErrorMessage } = useMutations(['setErrorMessage']);
+    const errorMessage = computed(() => store.getters['auth/errorMessage']);
+    const signupAction = (payload) => store.dispatch('auth/signup', payload);
+    const setErrorMessage = (message) =>
+      store.commit('auth/setErrorMessage', message);
 
     // router
     const router = useRouter();
@@ -113,7 +117,7 @@ export default {
 
       if (await validUser()) {
         try {
-          await storeSignup(user.value);
+          await signupAction(user.value);
 
           if (errorMessage.value) return;
 

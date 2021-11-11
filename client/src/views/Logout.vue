@@ -2,13 +2,16 @@
 
 <script>
 import { useRouter } from 'vue-router';
-import { useActions } from '../helpers';
+import { useStore } from 'vuex';
 export default {
   name: 'Logout',
 
   setup() {
+    // store
+    const store = useStore();
+
     //vuex
-    const { logout: logoutAction } = useActions(['logout']);
+    const logoutAction = () => store.dispatch('auth/logout');
 
     //router
     const router = useRouter();

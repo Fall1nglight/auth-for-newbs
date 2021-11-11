@@ -65,6 +65,7 @@ import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 import Notes from '../components/Notes.vue';
+import { useStore } from 'vuex';
 
 export default {
   name: 'Dashboard',
@@ -80,10 +81,12 @@ export default {
     // schemas
     const { insert: schema } = schemas.note;
 
+    // store
+    const store = useStore();
+
     // vuex
-    const { user } = useState('auth', ['user']);
-    const { notes } = useState('notes', ['notes']);
-    const { insertNote: insertNoteStore } = useActions(['insertNote']);
+    const insertNoteStore = (payload) =>
+      store.dispatch('notes/insertNote', payload);
 
     // refs | local state
     const newNote = ref({
@@ -130,10 +133,8 @@ export default {
 
     // expose
     return {
-      user,
       newNote,
       formVisibility,
-      notes,
       message,
       insertNote,
     };

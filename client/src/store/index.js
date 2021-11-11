@@ -7,7 +7,13 @@ export default createStore({
   mutations: {},
   actions: {},
   modules: {
-    auth,
-    notes,
+    auth: {
+      namespaced: true,
+      ...auth,
+    },
+    notes: {
+      namespaced: true,
+      ...notes,
+    },
   },
 });

@@ -11,11 +11,11 @@ import AdminDashboard from '../views/AdminDashboard.vue';
 import Logout from '../views/Logout.vue';
 import NotFoundPage from '../views/NotFoundPage.vue';
 
-const authToken = computed(() => store.state.auth.authToken);
-const isLoggedIn = computed(() => store.getters.isLoggedIn);
-const isAdmin = computed(() => store.getters.isAdmin);
-const checkUser = () => store.dispatch('checkUser');
-const fetchNotes = () => store.dispatch('fetchNotes');
+const authToken = computed(() => store.getters['auth/authToken']);
+const isLoggedIn = computed(() => store.getters['auth/isLoggedIn']);
+const isAdmin = computed(() => store.getters['auth/isAdmin']);
+const checkUser = () => store.dispatch('auth/checkUser');
+const fetchNotes = () => store.dispatch('notes/fetchNotes');
 
 // todo | make little middlewares from these functions
 const isLoggedInRedirectDashboard = async (to, from, next) => {
