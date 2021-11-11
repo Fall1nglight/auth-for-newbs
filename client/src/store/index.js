@@ -1,6 +1,7 @@
 import { createStore } from 'vuex';
 import auth from './modules/auth';
 import notes from './modules/notes';
+import admin from './modules/admin';
 
 export default createStore({
   state: {},
@@ -14,6 +15,10 @@ export default createStore({
     notes: {
       namespaced: true,
       ...notes,
+    },
+    admin: {
+      namespaced: true,
+      ...admin,
     },
   },
 });

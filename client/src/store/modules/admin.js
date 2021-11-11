@@ -9,16 +9,18 @@ const request = axios.create({
 });
 
 const state = {
-  allNotes: [],
-  allUsers: [],
+  notes: [],
+  users: [],
   errorMessage: '',
 };
 
 const getters = {
-  getAllNotes: (state) => state.allNotes,
-
-  // todo | need to test this
-  getNoteById: (state, id) => state.allNotes.filter((note) => note._id === id),
+  notes: (state) => state.notes,
+  noteById: (state, id) => state.notes.filter((note) => note._id === id),
+  numOfNotes: (state) => state.notes.length,
+  users: (state) => state.users,
+  numOfUsers: (state) => state.users.length,
+  errorMessage: (state) => state.errorMessage,
 };
 
 const actions = {
@@ -30,9 +32,13 @@ const actions = {
     }
   },
 
-  fetchAllUsers: async ({ commit }) => {
+  fetchAllUsers: async ({ commit, rootGetters }) => {
     try {
-      const { data: response } = await request.get('/users');
+      const { data: response } = await request.get('/users', {
+        headers: {
+          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+        },
+      });
 
       commit('setUsers', response.allUsers);
     } catch (error) {
@@ -42,7 +48,7 @@ const actions = {
 };
 
 const mutations = {
-  setUsers: (state, users) => (state.allUsers = users),
+  setUsers: (state, users) => (state.users = users),
   setErrorMessage: (state, message) => (state.errorMessage = message),
 };
 

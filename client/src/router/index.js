@@ -16,6 +16,7 @@ const isLoggedIn = computed(() => store.getters['auth/isLoggedIn']);
 const isAdmin = computed(() => store.getters['auth/isAdmin']);
 const checkUser = () => store.dispatch('auth/checkUser');
 const fetchNotes = () => store.dispatch('notes/fetchNotes');
+const fetchAllUsers = () => store.dispatch('admin/fetchAllUsers');
 
 // todo | make little middlewares from these functions
 const isLoggedInRedirectDashboard = async (to, from, next) => {
@@ -66,7 +67,7 @@ const routes = [
     path: '/admin-dashboard',
     name: 'AdminDashbiard',
     component: AdminDashboard,
-    beforeEnter: [isLoggedInRedirectDashboard, checkAdmin, fetchNotes],
+    beforeEnter: [isLoggedInRedirectDashboard, checkAdmin, fetchAllUsers],
   },
   {
     path: '/logout',
