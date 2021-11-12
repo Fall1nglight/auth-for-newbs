@@ -34,6 +34,13 @@ app.use(
   middlewares.auth.isAdmin,
   routes.users
 );
+app.use(
+  '/api/v1/statistics',
+  ratelimiters.api,
+  middlewares.auth.isLoggedIn,
+  middlewares.auth.isAdmin,
+  routes.statistics
+);
 
 app.get('/', (_req, res) => {
   res.json({ message: 'Homepage' });

@@ -16,7 +16,6 @@ const state = {
 
 const getters = {
   notes: (state) => state.notes,
-  noteById: (state, id) => state.notes.filter((note) => note._id === id),
   numOfNotes: (state) => state.notes.length,
   users: (state) => state.users,
   numOfUsers: (state) => state.users.length,
@@ -24,9 +23,15 @@ const getters = {
 };
 
 const actions = {
-  fetchAllNotes: async ({ commit }) => {
+  fetchAllNotes: async ({ commit, rootGetters }) => {
     try {
-      // const {data: response} = await request.get('/')
+      const { data: response } = await request.get('/notes/all', {
+        headers: {
+          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+        },
+      });
+
+      commit('setNotes', response.allNotes);
     } catch (error) {
       errorHandler(error, commit);
     }
@@ -49,6 +54,7 @@ const actions = {
 
 const mutations = {
   setUsers: (state, users) => (state.users = users),
+  setNotes: (state, notes) => (state.notes = notes),
   setErrorMessage: (state, message) => (state.errorMessage = message),
 };
 

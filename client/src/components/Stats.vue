@@ -1,9 +1,11 @@
 <template>
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mt-4">
     <stat :icon="'people-fill'" :value="numOfUsers">Total Users</stat>
-    <stat :icon="'card-text'" :value="67">Total Notes</stat>
-    <stat :icon="'pencil-square'" :value="23">Total Edits</stat>
-    <stat :icon="'card-checklist'" :value="39">Marked Done</stat>
+    <stat :icon="'card-text'" :value="numOfNotes">Total Notes</stat>
+    <stat :icon="'pencil-square'" :value="numOfEditedNotes">Total Edits</stat>
+    <stat :icon="'card-checklist'" :value="numOfMarkedDoneNotes"
+      >Marked Done</stat
+    >
   </div>
 </template>
 
@@ -24,12 +26,25 @@ export default {
 
     // vuex
     const notes = computed(() => store.getters['admin/notes']);
-
     const users = computed(() => store.getters['admin/users']);
     const numOfUsers = computed(() => store.getters['admin/numOfUsers']);
+    const numOfNotes = computed(() => store.getters['admin/numOfNotes']);
+    const numOfEditedNotes = computed(
+      () => store.getters['statistics/numOfEditedNotes']
+    );
+    const numOfMarkedDoneNotes = computed(
+      () => store.getters['statistics/numOfMarkedDoneNotes']
+    );
 
     // expose
-    return { notes, users, numOfUsers };
+    return {
+      notes,
+      users,
+      numOfUsers,
+      numOfNotes,
+      numOfEditedNotes,
+      numOfMarkedDoneNotes,
+    };
   },
 };
 </script>

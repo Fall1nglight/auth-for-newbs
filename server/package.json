@@ -7,6 +7,7 @@
     "start": "node --no-deprecation src/index.js",
     "dev": "nodemon --no-deprecation src/index.js",
     "seed:admin": "node --no-deprecation src/tasks/create_admin_user.js",
+    "seed:statistics": "node --no-deprecation src/tasks/create_statistics.js",
     "lint": "eslint src/",
     "test": "mocha --no-deprecation src/tests --watch"
   },

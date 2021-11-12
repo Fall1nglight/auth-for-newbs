@@ -1,4 +1,4 @@
-const { notes } = require('./notes.model');
+const { notes, statistics } = require('./notes.model');
 const { respondWithError } = require('../../../helpers');
 
 const get = async (req, res, next) => {
@@ -6,9 +6,20 @@ const get = async (req, res, next) => {
     const {
       user: { _id: userId },
     } = req;
+
     const userNotes = await notes.find({ userId });
 
     res.json({ userNotes });
+  } catch (error) {
+    respondWithError(res, next, error);
+  }
+};
+
+const getAll = async (req, res, next) => {
+  try {
+    const allNotes = await notes.find({});
+
+    res.json({ allNotes });
   } catch (error) {
     respondWithError(res, next, error);
   }
@@ -53,6 +64,23 @@ const patch = async (req, res, next) => {
     );
 
     if (!updatedNote) throw new Error('Failed to update note. (Backend error)');
+
+    if (body.reminder) {
+      await statistics.findOneAndUpdate(
+        { name: 'numOfMarkedDone' },
+        {
+          $inc: { value: 1 },
+        }
+      );
+    } else if (body.title || body.note) {
+      await statistics.findOneAndUpdate(
+        { name: 'numOfEdited' },
+        {
+          $inc: { value: 1 },
+        }
+      );
+    }
+
     res.json({ updatedNote });
   } catch (error) {
     respondWithError(res, next, error);
@@ -72,6 +100,7 @@ const deleteRoute = async (req, res, next) => {
     });
 
     if (!deletedNote) return res.json({ success: false });
+
     res.json({ success: true });
   } catch (error) {
     respondWithError(res, next, error);
@@ -80,6 +109,7 @@ const deleteRoute = async (req, res, next) => {
 
 module.exports = {
   get,
+  getAll,
   post,
   patch,
   deleteRoute,

@@ -5,11 +5,25 @@ Add JWT-based authentication to a Node/Express/Mongo app.
 ## Todo
 
 - [ ] Refactor client-side
-  - [ ] Use axios instead of fetch
-  - [ ] Use Vuex
-    - [ ] Create different stores
-      - [ ] Auth & User
-      - [ ] Notes
+
+  - [x] Use axios instead of fetch
+  - [x] Use Vuex
+    - [x] Create different stores
+      - [x] Auth & User
+      - [x] Notes
+  - [ ] Proper way to display error messages
+  - [ ] Divide dashboard features into components
+    - [ ] Insert note form
+  - [ ] Use mutation types (vuex)
+
+- [ ] Users can mark their notes as public
+
+  - [ ] Public notes are shown on the homepage
+    - [ ] Filter by different options (date, username)
+
+- [ ] Admin Dashboard Functionality
+  - [ ] View statistics
+  - [ ] User editor
 
 ## Authentication
 

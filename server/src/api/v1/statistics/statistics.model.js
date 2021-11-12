@@ -1,7 +1,5 @@
 const db = require('../../../db/connection');
 
-const users = db.get('users');
-const notes = db.get('notes');
-const statistics = db.get('notes');
+const statistics = db.get('statistics');
 
-module.exports = { users, notes, statistics };
+module.exports = { statistics };
