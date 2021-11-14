@@ -25,8 +25,6 @@ export default {
     const store = useStore();
 
     // vuex
-    const notes = computed(() => store.getters['admin/notes']);
-    const users = computed(() => store.getters['admin/users']);
     const numOfUsers = computed(() => store.getters['admin/numOfUsers']);
     const numOfNotes = computed(() => store.getters['admin/numOfNotes']);
     const numOfEditedNotes = computed(
@@ -38,8 +36,6 @@ export default {
 
     // expose
     return {
-      notes,
-      users,
       numOfUsers,
       numOfNotes,
       numOfEditedNotes,

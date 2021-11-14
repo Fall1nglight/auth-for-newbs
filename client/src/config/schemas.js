@@ -50,7 +50,26 @@ const auth = {
   }),
 };
 
+const admin = {
+  update: Joi.object({
+    username: Joi.string()
+      .regex(/(^[a-zA-Z0-9_]+$)/)
+      .min(2)
+      .max(30),
+
+    password: Joi.string()
+      .regex(/^\S+$/)
+      .min(10)
+      .max(30),
+    role: Joi.string().valid('user', 'admin'),
+    active: Joi.boolean(),
+  })
+    .or('username', 'password', 'role', 'active')
+    .required(),
+};
+
 export default {
   note,
   auth,
+  admin,
 };

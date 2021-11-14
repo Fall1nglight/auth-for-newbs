@@ -59,6 +59,8 @@ const patch = async (req, res, next) => {
       { $set: { ...body, updatedAt: new Date().getTime() } }
     );
 
+    delete updatedUser.password;
+
     res.json({ updatedUser });
   } catch (error) {
     respondWithError(res, next, error);
