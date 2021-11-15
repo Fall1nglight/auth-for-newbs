@@ -9,14 +9,11 @@ const request = axios.create({
 });
 
 const state = {
-  notes: [],
   users: [],
   errorMessage: '',
 };
 
 const getters = {
-  notes: (state) => state.notes,
-  numOfNotes: (state) => state.notes.length,
   users: (state) => state.users,
   userByName: (state) => (username) =>
     state.users.filter((user) => user.username === username),
@@ -25,21 +22,6 @@ const getters = {
 };
 
 const actions = {
-  // todo | move this to statistics
-  fetchAllNotes: async ({ commit, rootGetters }) => {
-    try {
-      const { data: response } = await request.get('/notes/all', {
-        headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
-        },
-      });
-
-      commit('setNotes', response.allNotes);
-    } catch (error) {
-      errorHandler(error, commit);
-    }
-  },
-
   fetchAllUsers: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/users', {
@@ -85,7 +67,6 @@ const mutations = {
     (state.users = state.users.map((user) =>
       user._id === userToUpdate._id ? userToUpdate : user
     )),
-  setNotes: (state, notes) => (state.notes = notes),
   setErrorMessage: (state, message) => (state.errorMessage = message),
 };
 

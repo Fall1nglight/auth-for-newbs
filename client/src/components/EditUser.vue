@@ -240,8 +240,6 @@ export default {
       );
     };
 
-    // computed
-
     // watch
     watch(searchInput, async () => {
       clearUser();

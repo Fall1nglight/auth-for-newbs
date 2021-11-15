@@ -21,17 +21,16 @@ Add JWT-based authentication to a Node/Express/Mongo app.
   - [ ] Public notes are shown on the homepage
     - [ ] Filter by different options (date, username)
 
-- [ ] Admin Dashboard Functionality
-  - [ ] View statistics
-  - [ ] User editor
+- [x] Admin Dashboard Functionality
+  - [x] View statistics
+  - [x] User editor
 
 ## Authentication
 
-- [ ] If logged in:
+- [] If logged in:
 
   - [x] Show logout button in header
-
-- [ ] Show user icon and username in header
+  - [ ] Show user icon and username in header
   - [ ] User can upload profile picture
 
 ## STRETCH

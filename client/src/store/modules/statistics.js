@@ -9,16 +9,32 @@ const request = axios.create({
 });
 
 const state = {
+  numOfNotes: 0,
   numOfEditedNotes: 0,
   numOfMarkedDoneNotes: 0,
 };
 
 const getters = {
+  numOfNotes: (state) => state.numOfNotes,
   numOfEditedNotes: (state) => state.numOfEditedNotes,
   numOfMarkedDoneNotes: (state) => state.numOfMarkedDoneNotes,
 };
 
 const actions = {
+  fetchNumberOfNotes: async ({ commit, rootGetters }) => {
+    try {
+      const { data: response } = await request.get('/statistics/num-of-notes', {
+        headers: {
+          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+        },
+      });
+
+      commit('setNumOfNotes', response.numOfNotes);
+    } catch (error) {
+      errorHandler(error, commit);
+    }
+  },
+
   fetchEditedNotes: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/statistics/edited-notes', {
@@ -49,6 +65,7 @@ const actions = {
 };
 
 const mutations = {
+  setNumOfNotes: (state, numOfNotes) => (state.numOfNotes = numOfNotes),
   setNumOfMarkedDoneNotes: (state, value) =>
     (state.numOfMarkedDoneNotes = value),
   setNumOfEditedNotes: (state, value) => (state.numOfEditedNotes = value),

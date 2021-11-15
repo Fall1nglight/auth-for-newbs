@@ -18,7 +18,6 @@ export default function useDisplayMessage() {
   });
 
   const setDisplayMessage = (msg, type) => {
-    console.log('called with value', msg);
     message.value.message = msg;
     message.value.type = type || '';
   };

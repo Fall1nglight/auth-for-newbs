@@ -26,7 +26,7 @@ export default {
 
     // vuex
     const numOfUsers = computed(() => store.getters['admin/numOfUsers']);
-    const numOfNotes = computed(() => store.getters['admin/numOfNotes']);
+    const numOfNotes = computed(() => store.getters['statistics/numOfNotes']);
     const numOfEditedNotes = computed(
       () => store.getters['statistics/numOfEditedNotes']
     );

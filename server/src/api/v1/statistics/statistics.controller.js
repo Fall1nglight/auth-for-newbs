@@ -1,4 +1,4 @@
-const { statistics } = require('./statistics.model');
+const { statistics, notes } = require('./statistics.model');
 const { respondWithError } = require('../../../helpers');
 
 const getEditedNotes = async (req, res, next) => {
@@ -23,7 +23,18 @@ const getDoneNotes = async (req, res, next) => {
   }
 };
 
+const getNumOfNotes = async (req, res, next) => {
+  try {
+    const allNotes = await notes.find({});
+
+    res.json({ numOfNotes: allNotes.length });
+  } catch (error) {
+    respondWithError(res, next, error);
+  }
+};
+
 module.exports = {
+  getNumOfNotes,
   getEditedNotes,
   getDoneNotes,
 };

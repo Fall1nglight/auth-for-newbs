@@ -17,8 +17,8 @@ const isAdmin = computed(() => store.getters['auth/isAdmin']);
 const checkUser = () => store.dispatch('auth/checkUser');
 const fetchNotes = () => store.dispatch('notes/fetchNotes');
 const fetchAllUsers = () => store.dispatch('admin/fetchAllUsers');
-const fetchAllNotes = () => store.dispatch('admin/fetchAllNotes');
 const fetchStatistics = () => {
+  store.dispatch('statistics/fetchNumberOfNotes');
   store.dispatch('statistics/fetchEditedNotes');
   store.dispatch('statistics/fetchMarkedDoneNotes');
 };
@@ -72,7 +72,6 @@ const routes = [
       isLoggedInRedirectDashboard,
       checkAdmin,
       fetchAllUsers,
-      fetchAllNotes,
       fetchStatistics,
     ],
   },
