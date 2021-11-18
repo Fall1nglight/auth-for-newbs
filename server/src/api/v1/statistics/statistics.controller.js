@@ -17,6 +17,7 @@ const getDoneNotes = async (req, res, next) => {
       name: 'numOfMarkedDone',
     });
 
+    // towo | rewrite logic for updated notes
     res.json(numOfMarkedDone);
   } catch (error) {
     respondWithError(res, next, error);

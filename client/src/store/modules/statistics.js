@@ -12,12 +12,14 @@ const state = {
   numOfNotes: 0,
   numOfEditedNotes: 0,
   numOfMarkedDoneNotes: 0,
+  errorMessage: '',
 };
 
 const getters = {
   numOfNotes: (state) => state.numOfNotes,
   numOfEditedNotes: (state) => state.numOfEditedNotes,
   numOfMarkedDoneNotes: (state) => state.numOfMarkedDoneNotes,
+  errorMessage: (state) => state.errorMessage,
 };
 
 const actions = {
@@ -69,6 +71,7 @@ const mutations = {
   setNumOfMarkedDoneNotes: (state, value) =>
     (state.numOfMarkedDoneNotes = value),
   setNumOfEditedNotes: (state, value) => (state.numOfEditedNotes = value),
+  setErrorMessage: (state, message) => (state.errorMessage = message),
 };
 
 export default {

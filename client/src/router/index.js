@@ -16,6 +16,7 @@ const isLoggedIn = computed(() => store.getters['auth/isLoggedIn']);
 const isAdmin = computed(() => store.getters['auth/isAdmin']);
 const checkUser = () => store.dispatch('auth/checkUser');
 const fetchNotes = () => store.dispatch('notes/fetchNotes');
+const fetchPublicNotes = () => store.dispatch('public/fetchNotes');
 const fetchAllUsers = () => store.dispatch('admin/fetchAllUsers');
 const fetchStatistics = () => {
   store.dispatch('statistics/fetchNumberOfNotes');
@@ -45,6 +46,7 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    beforeEnter: [fetchPublicNotes],
   },
   {
     path: '/signup',

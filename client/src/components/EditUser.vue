@@ -1,137 +1,139 @@
 <template>
-  <div class="row pt-5">
-    <div class="h3">Edit User</div>
+  <div class="row pt-5 justify-content-center">
+    <div class="col-md-5">
+      <div class="h3">Edit User</div>
+      <display-message :message="message"></display-message>
 
-    <display-message :message="message"></display-message>
-    <!-- todo -->
-    <!-- use watch and v-model instead of search -->
-    <!-- clear out form after submitting -->
-    <!-- send response that the user was updated -->
-    <!-- or change the form to the returned updated user -->
+      <!-- Searching user -->
+      <div class="input-group mb-3">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
 
-    <!-- Searching user -->
-    <div class="input-group mb-3">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input
+          v-model="searchInput"
+          type="text"
+          list="ShowDataList"
+          id="inputSearch"
+          class="form-control"
+          autocomplete="off"
+          placeholder="Search user by username."
+          aria-placeholder="Search user by username."
+        />
 
-      <input
-        v-model="searchInput"
-        type="text"
-        list="ShowDataList"
-        id="inputSearch"
-        class="form-control"
-        autocomplete="off"
-        placeholder="Search user by username."
-        aria-placeholder="Search user by username."
-      />
+        <datalist id="ShowDataList">
+          <option
+            v-for="user in users"
+            :key="user._id"
+            :value="user.username"
+          ></option>
+        </datalist>
+      </div>
 
-      <datalist id="ShowDataList">
-        <option
-          v-for="user in users"
-          :key="user._id"
-          :value="user.username"
-        ></option>
-      </datalist>
+      <!-- Editing user -->
+      <form @submit.prevent="editUser">
+        <!-- username -->
+        <div class="mb-3">
+          <label for="inputUsername" class="form-label">Updated Username</label>
+          <input
+            v-model="user.username"
+            type="text"
+            class="form-control"
+            id="inputUsername"
+            placeholder="Enter the updated username."
+            aria-placeholder="Enter the updated username."
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- password -->
+        <div class="mb-3">
+          <label for="inputPassword" class="form-label">Updated Password</label>
+          <input
+            v-model="user.password"
+            type="text"
+            class="form-control"
+            id="inputPassword"
+            placeholder="Enter the updated password."
+            aria-placeholder="Enter the updated password."
+            autocomplete="off"
+          />
+        </div>
+
+        <!-- role -->
+        <div class="mb-3 d-flex justify-content-center">
+          <div class="me-5">
+            <label class="form-check-label">Role</label>
+
+            <div class="form-check">
+              <input
+                :checked="user.role === 'user'"
+                v-model="user.role"
+                value="user"
+                class="form-check-input"
+                type="radio"
+                id="radioRoleUser"
+              />
+              <label class="form-check-label" for="radioRoleUser">
+                User
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input
+                :checked="user.role === 'admin'"
+                v-model="user.role"
+                value="admin"
+                class="form-check-input"
+                type="radio"
+                id="radioRoleAdmin"
+              />
+              <label class="form-check-label" for="radioRoleAdmin">
+                Admin
+              </label>
+            </div>
+          </div>
+
+          <!-- Active -->
+          <div>
+            <label class="form-check-label">Status</label>
+
+            <div class="form-check">
+              <input
+                v-model="user.active"
+                :checked="user._id.length && user.active"
+                :value="true"
+                class="form-check-input"
+                type="radio"
+                id="radioActiveTrue"
+              />
+              <label class="form-check-label" for="radioActiveTrue">
+                Active
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input
+                v-model="user.active"
+                :checked="user._id.length && !user.active"
+                :value="false"
+                class="form-check-input"
+                type="radio"
+                id="radioRoleInactive"
+              />
+              <label class="form-check-label" for="radioRoleInactive">
+                Inactive
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sumbit -->
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary">
+            Update user
+          </button>
+        </div>
+      </form>
     </div>
-
-    <!-- Editing user -->
-    <form @submit.prevent="editUser">
-      <!-- username -->
-      <div class="mb-3">
-        <label for="inputUsername" class="form-label">Updated Username</label>
-        <input
-          v-model="user.username"
-          type="text"
-          class="form-control"
-          id="inputUsername"
-          placeholder="Enter the updated username."
-          aria-placeholder="Enter the updated username."
-          autocomplete="off"
-        />
-      </div>
-
-      <!-- password -->
-      <div class="mb-3">
-        <label for="inputPassword" class="form-label">Updated Password</label>
-        <input
-          v-model="user.password"
-          type="text"
-          class="form-control"
-          id="inputPassword"
-          placeholder="Enter the updated password."
-          aria-placeholder="Enter the updated password."
-          autocomplete="off"
-        />
-      </div>
-
-      <!-- role -->
-      <div class="mb-3">
-        <label class="form-check-label">Role</label>
-
-        <div class="form-check">
-          <input
-            :checked="user.role === 'user'"
-            v-model="user.role"
-            value="user"
-            class="form-check-input"
-            type="radio"
-            id="radioRoleUser"
-          />
-          <label class="form-check-label" for="radioRoleUser">
-            User
-          </label>
-        </div>
-
-        <div class="form-check">
-          <input
-            :checked="user.role === 'admin'"
-            v-model="user.role"
-            value="admin"
-            class="form-check-input"
-            type="radio"
-            id="radioRoleAdmin"
-          />
-          <label class="form-check-label" for="radioRoleAdmin">
-            Admin
-          </label>
-        </div>
-      </div>
-
-      <!-- Active -->
-      <div class="mb-3">
-        <label class="form-check-label">Status</label>
-
-        <div class="form-check">
-          <input
-            v-model="user.active"
-            :checked="user._id.length && user.active"
-            :value="true"
-            class="form-check-input"
-            type="radio"
-            id="radioActiveTrue"
-          />
-          <label class="form-check-label" for="radioActiveTrue">
-            Active
-          </label>
-        </div>
-
-        <div class="form-check">
-          <input
-            v-model="user.active"
-            :checked="user._id.length && !user.active"
-            :value="false"
-            class="form-check-input"
-            type="radio"
-            id="radioRoleInactive"
-          />
-          <label class="form-check-label" for="radioRoleInactive">
-            Inactive
-          </label>
-        </div>
-      </div>
-
-      <!-- Sumbit -->
-      <button type="submit" class="btn btn-primary">Update user</button>
-    </form>
   </div>
 </template>
 

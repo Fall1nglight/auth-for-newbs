@@ -1,10 +1,3 @@
-export default function(
-  {
-    response: {
-      data: { message },
-    },
-  },
-  commit
-) {
+export default function(message, commit) {
   commit('setErrorMessage', message);
 }

@@ -42,6 +42,8 @@ app.use(
   routes.statistics
 );
 
+app.use('/api/v1/public', routes.public);
+
 app.get('/', (_req, res) => {
   res.json({ message: 'Homepage' });
 });

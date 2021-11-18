@@ -3,6 +3,12 @@ import auth from './modules/auth';
 import notes from './modules/notes';
 import admin from './modules/admin';
 import statistics from './modules/statistics';
+import pub from './modules/public';
+
+// todo
+// use vuex mutation types
+// use vuex removeNamespace method
+// ? refactor vuex
 
 export default createStore({
   state: {},
@@ -27,6 +33,11 @@ export default createStore({
     statistics: {
       namespaced: true,
       ...statistics,
+    },
+
+    public: {
+      namespaced: true,
+      ...pub,
     },
   },
 });
