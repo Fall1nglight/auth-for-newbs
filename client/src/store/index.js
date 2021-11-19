@@ -8,36 +8,17 @@ import pub from './modules/public';
 // todo
 // use vuex mutation types
 // use vuex removeNamespace method
-// ? refactor vuex
 
 export default createStore({
   state: {},
   mutations: {},
   actions: {},
+
   modules: {
-    auth: {
-      namespaced: true,
-      ...auth,
-    },
-
-    notes: {
-      namespaced: true,
-      ...notes,
-    },
-
-    admin: {
-      namespaced: true,
-      ...admin,
-    },
-
-    statistics: {
-      namespaced: true,
-      ...statistics,
-    },
-
-    public: {
-      namespaced: true,
-      ...pub,
-    },
+    auth,
+    notes,
+    admin,
+    statistics,
+    public: { ...pub },
   },
 });
