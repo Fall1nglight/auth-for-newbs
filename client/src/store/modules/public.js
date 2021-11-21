@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { Types } from '../types';
 import config from '../../config';
 import errorHandler from '../plugins/errorHandler';
 
@@ -14,16 +15,16 @@ const state = {
 };
 
 const getters = {
-  notes: (state) => state.notes,
-  errorMessage: (state) => state.errorMessage,
+  [Types.getters.GET_NOTES]: (state) => state.notes,
+  [Types.getters.GET_ERROR_MESSAGE]: (state) => state.errorMessage,
 };
 
 const actions = {
-  fetchNotes: async ({ commit }) => {
+  [Types.actions.FETCH_NOTES]: async ({ commit }) => {
     try {
       const { data: response } = await request.get('public/notes');
 
-      commit('setNotes', response.publicNotes);
+      commit(Types.mutations.SET_NOTES, response.publicNotes);
     } catch (error) {
       errorHandler(error, commit);
     }
@@ -31,8 +32,9 @@ const actions = {
 };
 
 const mutations = {
-  setNotes: (state, notes) => (state.notes = notes),
-  setErrorMessage: (state, message) => (state.errorMessage = message),
+  [Types.mutations.SET_NOTES]: (state, notes) => (state.notes = notes),
+  [Types.mutations.SET_ERROR_MESSAGE]: (state, message) =>
+    (state.errorMessage = message),
 };
 
 export default {

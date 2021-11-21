@@ -53,6 +53,8 @@ import { watch, ref, computed } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+import { Types } from '../store/types';
+import { auth } from '../store/types/namespaces';
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 
@@ -75,10 +77,15 @@ export default {
     const store = useStore();
 
     // vuex items
-    const errorMessage = computed(() => store.getters['auth/errorMessage']);
-    const loginAction = (payload) => store.dispatch('auth/login', payload);
+    const errorMessage = computed(
+      () => store.getters[`${auth}${Types.getters.GET_ERROR_MESSAGE}`]
+    );
+
+    const loginAction = (payload) =>
+      store.dispatch(`${auth}${Types.actions.LOGIN}`, payload);
+
     const setErrorMessage = (message) =>
-      store.commit('auth/setErrorMessage', message);
+      store.commit(`${auth}${Types.mutations.SET_ERROR_MESSAGE}`, message);
 
     // router
     const router = useRouter();
@@ -90,21 +97,18 @@ export default {
     });
 
     // functions
+    const resetErrorMessage = () => {
+      if (errorMessage.value) setErrorMessage('');
+    };
+
     const login = async () => {
-      setErrorMessage('');
-      setDisplayMessage('');
+      resetErrorMessage();
 
-      if (await validUser()) {
-        try {
-          await loginAction(user.value);
+      if (!(await validUser())) return;
+      await loginAction(user.value);
 
-          if (errorMessage.value) return;
-
-          router.push({ path: '/dashboard' });
-        } catch (error) {
-          setDisplayMessage(error.message, msgTypes.error);
-        }
-      }
+      if (errorMessage.value) return;
+      router.push({ path: '/dashboard' });
     };
 
     const validUser = async () => {
@@ -113,9 +117,9 @@ export default {
         return true;
       } catch (error) {
         if (error.message.includes('username')) {
-          setDisplayMessage('Username is invalid.', msgTypes.error);
+          setErrorMessage('Username is invalid.');
         } else {
-          setDisplayMessage('Password is invalid.', msgTypes.error);
+          setErrorMessage('Password is invalid.');
         }
         return false;
       }
@@ -123,8 +127,7 @@ export default {
 
     // watch
     watch(user.value, () => {
-      setDisplayMessage('');
-      setErrorMessage('');
+      resetErrorMessage();
     });
 
     watch(errorMessage, () => {

@@ -70,11 +70,13 @@
 </template>
 
 <script>
-import { ref } from '@vue/runtime-core';
+import { computed, ref, watch } from '@vue/runtime-core';
 import { useStore } from 'vuex';
 
 import useFormatDate from '../composables/useFormatDate';
 import useDisplayMessage from '../composables/useDisplayMessage';
+import { notes } from '../store/types/namespaces';
+import { Types } from '../store/types';
 
 export default {
   name: 'Note',
@@ -91,9 +93,18 @@ export default {
     const store = useStore();
 
     // vuex
+    const errorMessage = computed(
+      () => store.getters[`${notes}${Types.getters.GET_ERROR_MESSAGE}`]
+    );
+
     const editNoteAction = (payload) =>
-      store.dispatch('notes/editNote', payload);
-    const deleteNoteAction = (id) => store.dispatch('notes/deleteNote', id);
+      store.dispatch(`${notes}${Types.actions.EDIT_NOTE}`, payload);
+
+    const deleteNoteAction = (id) =>
+      store.dispatch(`${notes}${Types.actions.DELETE_NOTE}`, id);
+
+    const setErrorMessage = (message) =>
+      store.commit(`${notes}${Types.mutations.SET_ERROR_MESSAGE}`);
 
     // refs | local state
     const newNote = ref({
@@ -104,37 +115,48 @@ export default {
     const editState = ref(false);
 
     // functions
+
+    // ? reset all errors
+    const resetErrorMessage = () => {
+      if (errorMessage.value) setErrorMessage('');
+    };
+
     const updateReminder = async ({ _id: id, reminder }) => {
       try {
+        resetErrorMessage();
+
         await editNoteAction({ id, reminder: !reminder });
       } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
+        setErrorMessage(error.message);
       }
     };
 
     const editNote = async (id) => {
+      resetErrorMessage();
       editState.value = false;
 
-      try {
-        await editNoteAction({
-          id,
-          title: newNote.value.title,
-          note: newNote.value.note,
-        });
-      } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
-      }
+      await editNoteAction({
+        id,
+        title: newNote.value.title,
+        note: newNote.value.note,
+      });
     };
 
     const deleteNote = async (id) => {
       if (!confirm('Are you sure you want to delete this note?')) return;
+      resetErrorMessage();
 
-      try {
-        await deleteNoteAction(id);
-      } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
-      }
+      await deleteNoteAction(id);
     };
+
+    // watch
+    watch(newNote.value, () => {
+      resetErrorMessage();
+    });
+
+    watch(errorMessage, () => {
+      setDisplayMessage(errorMessage.value, msgTypes.error);
+    });
 
     // expose
     return {

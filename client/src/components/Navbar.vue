@@ -71,6 +71,8 @@
 import { computed, ref, watch } from '@vue/runtime-core';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
+import { Types } from '../store/types';
+import { auth } from '../store/types/namespaces';
 
 const protectedRoutes = ['/', '/login', '/signup'];
 
@@ -84,8 +86,12 @@ export default {
     const store = useStore();
 
     // vuex
-    const user = computed(() => store.getters['auth/user']);
-    const isAdmin = computed(() => store.getters['auth/isAdmin']);
+    const user = computed(
+      () => store.getters[`${auth}${Types.getters.GET_USER}`]
+    );
+    const isAdmin = computed(
+      () => store.getters[`${auth}${Types.getters.IS_ADMIN}`]
+    );
 
     //route
     const route = useRoute();

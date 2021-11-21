@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { Types } from '../types';
 import config from '../../config';
 import errorHandler from '../plugins/errorHandler';
 
@@ -16,14 +17,15 @@ const state = {
 };
 
 const getters = {
-  numOfNotes: (state) => state.numOfNotes,
-  numOfEditedNotes: (state) => state.numOfEditedNotes,
-  numOfMarkedDoneNotes: (state) => state.numOfMarkedDoneNotes,
-  errorMessage: (state) => state.errorMessage,
+  [Types.getters.GET_NUM_OF_NOTES]: (state) => state.numOfNotes,
+  [Types.getters.GET_NUM_OF_EDITED_NOTES]: (state) => state.numOfEditedNotes,
+  [Types.getters.GET_NUM_OF_MARKED_DONE_NOTES]: (state) =>
+    state.numOfMarkedDoneNotes,
+  [Types.getters.GET_ERROR_MESSAGE]: (state) => state.errorMessage,
 };
 
 const actions = {
-  fetchNumberOfNotes: async ({ commit, rootGetters }) => {
+  [Types.actions.FETCH_NUM_OF_NOTES]: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/statistics/num-of-notes', {
         headers: {
@@ -31,13 +33,13 @@ const actions = {
         },
       });
 
-      commit('setNumOfNotes', response.numOfNotes);
+      commit(Types.mutations.SET_NUM_OF_NOTES, response.numOfNotes);
     } catch (error) {
       errorHandler(error, commit);
     }
   },
 
-  fetchEditedNotes: async ({ commit, rootGetters }) => {
+  [Types.actions.FETCH_EDITED_NOTES]: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/statistics/edited-notes', {
         headers: {
@@ -45,13 +47,13 @@ const actions = {
         },
       });
 
-      commit('setNumOfEditedNotes', response.value);
+      commit(Types.mutations.SET_NUM_OF_EDITED_NOTES, response.value);
     } catch (error) {
       errorHandler(error, commit);
     }
   },
 
-  fetchMarkedDoneNotes: async ({ commit, rootGetters }) => {
+  [Types.actions.FETCH_MARKED_DONE_NOTES]: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/statistics/done-notes', {
         headers: {
@@ -59,7 +61,7 @@ const actions = {
         },
       });
 
-      commit('setNumOfMarkedDoneNotes', response.value);
+      commit(Types.mutations.SET_NUM_OF_MARKED_DONE_NOTES, response.value);
     } catch (error) {
       errorHandler(error, commit);
     }
@@ -67,11 +69,14 @@ const actions = {
 };
 
 const mutations = {
-  setNumOfNotes: (state, numOfNotes) => (state.numOfNotes = numOfNotes),
-  setNumOfMarkedDoneNotes: (state, value) =>
+  [Types.mutations.SET_NUM_OF_NOTES]: (state, numOfNotes) =>
+    (state.numOfNotes = numOfNotes),
+  [Types.mutations.SET_NUM_OF_EDITED_NOTES]: (state, value) =>
+    (state.numOfEditedNotes = value),
+  [Types.mutations.SET_NUM_OF_MARKED_DONE_NOTES]: (state, value) =>
     (state.numOfMarkedDoneNotes = value),
-  setNumOfEditedNotes: (state, value) => (state.numOfEditedNotes = value),
-  setErrorMessage: (state, message) => (state.errorMessage = message),
+  [Types.mutations.SET_ERROR_MESSAGE]: (state, message) =>
+    (state.errorMessage = message),
 };
 
 export default {

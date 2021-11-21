@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { Types } from '../types';
 import config from '../../config';
 import errorHandler from '../plugins/errorHandler';
 
@@ -14,15 +15,15 @@ const state = {
 };
 
 const getters = {
-  users: (state) => state.users,
-  userByName: (state) => (username) =>
+  [Types.getters.GET_USERS]: (state) => state.users,
+  [Types.getters.GET_USER_BY_NAME]: (state) => (username) =>
     state.users.filter((user) => user.username === username),
-  numOfUsers: (state) => state.users.length,
-  errorMessage: (state) => state.errorMessage,
+  [Types.getters.GET_NUM_OF_USERS]: (state) => state.users.length,
+  [Types.getters.GET_ERROR_MESSAGE]: (state) => state.errorMessage,
 };
 
 const actions = {
-  fetchAllUsers: async ({ commit, rootGetters }) => {
+  [Types.actions.FETCH_ALL_USERS]: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/users', {
         headers: {
@@ -30,13 +31,13 @@ const actions = {
         },
       });
 
-      commit('setUsers', response.allUsers);
+      commit(Types.mutations.SET_USERS, response.allUsers);
     } catch (error) {
       errorHandler(error, commit);
     }
   },
 
-  updateUser: async ({ commit, rootGetters }, user) => {
+  [Types.actions.UPDATE_USER]: async ({ commit, rootGetters }, user) => {
     try {
       // extract id then delete it to pass the backend validation
       const { id, modifiedUser: userToUpdate } = user;
@@ -54,7 +55,7 @@ const actions = {
 
       if (!response.updatedUser) return;
 
-      commit('updateUser', response.updatedUser);
+      commit(Types.mutations.UPDATE_USER, response.updatedUser);
     } catch (error) {
       errorHandler(error, commit);
     }
@@ -62,12 +63,13 @@ const actions = {
 };
 
 const mutations = {
-  setUsers: (state, users) => (state.users = users),
-  updateUser: (state, userToUpdate) =>
+  [Types.mutations.SET_USERS]: (state, users) => (state.users = users),
+  [Types.mutations.UPDATE_USER]: (state, userToUpdate) =>
     (state.users = state.users.map((user) =>
       user._id === userToUpdate._id ? userToUpdate : user
     )),
-  setErrorMessage: (state, message) => (state.errorMessage = message),
+  [Types.mutations.SET_ERROR_MESSAGE]: (state, message) =>
+    (state.errorMessage = message),
 };
 
 export default {

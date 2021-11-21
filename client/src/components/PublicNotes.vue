@@ -11,6 +11,8 @@
 <script>
 import { computed } from '@vue/reactivity';
 import { useStore } from 'vuex';
+import { Types } from '../store/types';
+import { pub } from '../store/types/namespaces';
 
 import PublicNote from '../components/PublicNote.vue';
 
@@ -25,7 +27,9 @@ export default {
     const store = useStore();
 
     // vuex
-    const publicNotes = computed(() => store.getters['public/notes']);
+    const publicNotes = computed(
+      () => store.getters[`${pub}${Types.getters.GET_NOTES}`]
+    );
 
     // expose
     return {

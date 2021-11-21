@@ -1,6 +1,8 @@
 import axios from 'axios';
 
+import { Types } from '../types';
 import config from '../../config';
+import errorHandler from '../plugins/errorHandler';
 
 const request = axios.create({
   baseURL: `${config.api.url}`,
@@ -13,12 +15,12 @@ const state = {
 };
 
 const getters = {
-  notes: (state) => state.notes,
-  errorMessage: (state) => state.errorMessage,
+  [Types.getters.GET_NOTES]: (state) => state.notes,
+  [Types.getters.GET_ERROR_MESSAGE]: (state) => state.errorMessage,
 };
 
 const actions = {
-  fetchNotes: async ({ commit, rootGetters }) => {
+  [Types.actions.FETCH_NOTES]: async ({ commit, rootGetters }) => {
     try {
       const { data: response } = await request.get('/notes', {
         headers: {
@@ -26,17 +28,13 @@ const actions = {
         },
       });
 
-      commit('setNotes', response.userNotes);
-    } catch ({
-      response: {
-        data: { message },
-      },
-    }) {
-      commit('setErrorMessage', message);
+      commit(Types.mutations.SET_NOTES, response.userNotes);
+    } catch (error) {
+      errorHandler(error, commit);
     }
   },
 
-  insertNote: async ({ commit, rootGetters }, note) => {
+  [Types.actions.INSERT_NOTE]: async ({ commit, rootGetters }, note) => {
     try {
       const { data: response } = await request.post('/notes', note, {
         headers: {
@@ -44,17 +42,13 @@ const actions = {
         },
       });
 
-      commit('addNote', response.newNote);
-    } catch ({
-      response: {
-        data: { message },
-      },
-    }) {
-      commit('setErrorMessage', message);
+      commit(Types.mutations.ADD_NOTE, response.newNote);
+    } catch (error) {
+      errorHandler(error, commit);
     }
   },
 
-  editNote: async ({ commit, rootGetters }, note) => {
+  [Types.actions.EDIT_NOTE]: async ({ commit, rootGetters }, note) => {
     try {
       const { id } = note;
       delete note.id;
@@ -69,17 +63,13 @@ const actions = {
         }
       );
 
-      commit('editNote', response.updatedNote);
-    } catch ({
-      response: {
-        data: { message },
-      },
-    }) {
-      commit('setErrorMessage', message);
+      commit(Types.mutations.EDIT_NOTE, response.updatedNote);
+    } catch (error) {
+      errorHandler(error, commit);
     }
   },
 
-  deleteNote: async ({ commit, rootGetters }, id) => {
+  [Types.actions.DELETE_NOTE]: async ({ commit, rootGetters }, id) => {
     try {
       const { data: response } = await request.delete(`/notes/${id}`, {
         headers: {
@@ -87,30 +77,27 @@ const actions = {
         },
       });
 
-      if (response.success) commit('deleteNote', id);
-    } catch ({
-      response: {
-        data: { message },
-      },
-    }) {
-      commit('setErrorMessage', message);
+      if (response.success) commit(Types.mutations.DELETE_NOTE, id);
+    } catch (error) {
+      errorHandler(error, commit);
     }
   },
 };
 
 const mutations = {
-  setNotes: (state, notes) => (state.notes = notes),
-  addNote: (state, note) => state.notes.push(note),
-  editNote: (state, newNote) => {
+  [Types.mutations.SET_NOTES]: (state, notes) => (state.notes = notes),
+  [Types.mutations.ADD_NOTE]: (state, note) => state.notes.push(note),
+  [Types.mutations.EDIT_NOTE]: (state, newNote) => {
     state.notes = state.notes.map((note) =>
       // if the requested note is found, update it else return the original note
       note._id === newNote._id ? { ...state.note, ...newNote } : note
     );
   },
-  deleteNote: (state, id) => {
+  [Types.mutations.DELETE_NOTE]: (state, id) => {
     state.notes = state.notes.filter((note) => note._id !== id);
   },
-  setErrorMessage: (state, message) => (state.errorMessage = message),
+  [Types.mutations.SET_ERROR_MESSAGE]: (state, message) =>
+    (state.errorMessage = message),
 };
 
 export default {

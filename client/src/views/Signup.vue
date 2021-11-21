@@ -70,13 +70,15 @@
 <script>
 import { watch, ref, computed } from '@vue/runtime-core';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import { passwordStrength } from 'check-password-strength';
 
+import { Types } from '../store/types';
+import { auth } from '../store/types/namespaces';
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
-import { useStore } from 'vuex';
 
 export default {
   name: 'Signup',
@@ -95,10 +97,15 @@ export default {
     const store = useStore();
 
     // vuex
-    const errorMessage = computed(() => store.getters['auth/errorMessage']);
-    const signupAction = (payload) => store.dispatch('auth/signup', payload);
+    const errorMessage = computed(
+      () => store.getters[`${auth}${Types.getters.GET_ERROR_MESSAGE}`]
+    );
+
+    const signupAction = (payload) =>
+      store.dispatch(`${auth}${Types.actions.SIGNUP}`, payload);
+
     const setErrorMessage = (message) =>
-      store.commit('auth/setErrorMessage', message);
+      store.commit(`${auth}${Types.mutations.SET_ERROR_MESSAGE}`, message);
 
     // router
     const router = useRouter();
@@ -111,21 +118,18 @@ export default {
     });
 
     // functions
+    const resetErrorMessage = () => {
+      if (errorMessage.value) setErrorMessage('');
+    };
+
     const signup = async () => {
-      setDisplayMessage('');
-      setErrorMessage('');
+      resetErrorMessage();
 
-      if (await validUser()) {
-        try {
-          await signupAction(user.value);
+      if (!(await validUser())) return;
+      await signupAction(user.value);
 
-          if (errorMessage.value) return;
-
-          router.push({ path: '/dashboard' });
-        } catch (error) {
-          setDisplayMessage(error.message, msgTypes.error);
-        }
-      }
+      if (errorMessage.value) return;
+      router.push({ path: '/dashboard' });
     };
 
     const validUser = async () => {
@@ -135,11 +139,11 @@ export default {
         return true;
       } catch (error) {
         if (error.message.includes('username')) {
-          setDisplayMessage('Username is invalid.', msgTypes.error);
+          setErrorMessage('Username is invalid.');
         } else if (error.message.includes('"Confirm Password"')) {
-          setDisplayMessage('Confirm password must match.', msgTypes.error);
+          setErrorMessage('Confirm password must match');
         } else {
-          setDisplayMessage('Password is invalid.', msgTypes.error);
+          setErrorMessage('Password is invalid');
         }
         return false;
       }
@@ -152,8 +156,7 @@ export default {
 
     // watch
     watch(user.value, () => {
-      setDisplayMessage('');
-      setErrorMessage('');
+      resetErrorMessage();
     });
 
     watch(errorMessage, () => {

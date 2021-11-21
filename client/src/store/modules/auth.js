@@ -1,6 +1,8 @@
 import axios from 'axios';
 
+import { Types } from '../types';
 import config from '../../config';
+import errorHandler from '../plugins/errorHandler';
 
 const request = axios.create({
   baseURL: `${config.auth.url}`,
@@ -14,78 +16,66 @@ const state = {
 };
 
 const getters = {
-  authToken: (state) => state.authToken,
-  user: (state) => state.user,
-  userId: (state) => state.user._id,
-  isLoggedIn: (state) => !!state.user._id,
-  isAdmin: (state) => (state.user.role === 'admin' ? true : false),
-  errorMessage: (state) => state.errorMessage,
+  [Types.getters.GET_AUTHTOKEN]: (state) => state.authToken,
+  [Types.getters.GET_USER]: (state) => state.user,
+  [Types.getters.GET_USER_ID]: (state) => state.user._id,
+  [Types.getters.IS_LOGGED_IN]: (state) => !!state.user._id,
+  [Types.getters.IS_ADMIN]: (state) =>
+    state.user.role === 'admin' ? true : false,
+  [Types.getters.GET_ERROR_MESSAGE]: (state) => state.errorMessage,
 };
 
 const actions = {
-  checkUser: async ({ commit, dispatch, state }) => {
+  [Types.actions.CHECK_USER]: async ({ commit, dispatch, state }) => {
     try {
-      console.log('incoming token:', state.authToken);
-
       const { data: response } = await request.get('/checkuser', {
         headers: { Authorization: `Bearer ${state.authToken}` },
       });
 
-      if (response.user) return commit('setUser', response.user);
-      dispatch('logout');
-    } catch ({
-      response: {
-        data: { message },
-      },
-    }) {
-      commit('setErrorMessage', message);
+      if (response.user) return commit(Types.mutations.SET_USER, response.user);
+      dispatch(Types.actions.LOGOUT);
+    } catch (error) {
+      errorHandler(error, commit);
     }
   },
 
-  signup: async ({ commit }, { username, password }) => {
+  [Types.actions.SIGNUP]: async ({ commit }, { username, password }) => {
     try {
       const { data: response } = await request.post('/signup', {
         username,
         password,
       });
 
-      commit('setAuthToken', response.token);
-    } catch ({
-      response: {
-        data: { message },
-      },
-    }) {
-      commit('setErrorMessage', message);
+      commit(Types.mutations.SET_AUTH_TOKEN, response.token);
+    } catch (error) {
+      errorHandler(error, commit);
     }
   },
 
-  login: async ({ commit }, user) => {
+  [Types.actions.LOGIN]: async ({ commit }, user) => {
     try {
       const { data: response } = await request.post('/login', user);
 
-      commit('setAuthToken', response.token);
-    } catch ({
-      response: {
-        data: { message },
-      },
-    }) {
-      commit('setErrorMessage', message);
+      commit(Types.mutations.SET_AUTH_TOKEN, response.token);
+    } catch (error) {
+      errorHandler(error, commit);
     }
   },
 
-  logout: ({ commit }) => {
-    commit('setAuthToken', '');
-    commit('setUser', {});
+  [Types.actions.LOGOUT]: ({ commit }) => {
+    commit(Types.mutations.SET_AUTH_TOKEN, '');
+    commit(Types.mutations.SET_USER, {});
   },
 };
 
 const mutations = {
-  setAuthToken: (state, token) => {
+  [Types.mutations.SET_AUTH_TOKEN]: (state, token) => {
     state.authToken = token;
     localStorage.token = token;
   },
-  setUser: (state, user) => (state.user = user),
-  setErrorMessage: (state, message) => (state.errorMessage = message),
+  [Types.mutations.SET_USER]: (state, user) => (state.user = user),
+  [Types.mutations.SET_ERROR_MESSAGE]: (state, message) =>
+    (state.errorMessage = message),
 };
 
 export default {

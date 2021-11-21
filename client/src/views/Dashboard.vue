@@ -57,14 +57,16 @@
 </template>
 
 <script>
-import { ref, watch } from '@vue/runtime-core';
+import { computed, ref, watch } from '@vue/runtime-core';
+import { useStore } from 'vuex';
 
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 import Notes from '../components/Notes.vue';
-import { useStore } from 'vuex';
+import { notes } from '../store/types/namespaces';
+import { Types } from '../store/types';
 
 export default {
   name: 'Dashboard',
@@ -84,8 +86,15 @@ export default {
     const store = useStore();
 
     // vuex
+    const errorMessage = computed(
+      () => store.getters[`${notes}${Types.getters.GET_ERROR_MESSAGE}`]
+    );
+
     const insertNoteStore = (payload) =>
-      store.dispatch('notes/insertNote', payload);
+      store.dispatch(`${notes}${Types.actions.INSERT_NOTE}`, payload);
+
+    const setErrorMessage = (message) =>
+      store.commit(`${notes}${Types.mutations.SET_ERROR_MESSAGE}`);
 
     // refs | local state
     const newNote = ref({
@@ -96,6 +105,10 @@ export default {
     const formVisibility = ref(false);
 
     // functions
+    const resetErrorMessage = () => {
+      if (errorMessage.value) setErrorMessage('');
+    };
+
     const resetForm = () => {
       newNote.value.title = '';
       newNote.value.note = '';
@@ -107,27 +120,27 @@ export default {
         await schema.validateAsync(newNote.value);
         return true;
       } catch (error) {
-        setDisplayMessage(error.message, msgTypes.error);
+        setErrorMessage(error.message);
         return false;
       }
     };
 
     const insertNote = async () => {
-      setDisplayMessage('');
+      resetErrorMessage();
 
-      if (await validNote()) {
-        try {
-          await insertNoteStore(newNote.value);
-          resetForm();
-        } catch (error) {
-          setDisplayMessage(error.message, msgTypes.error);
-        }
-      }
+      if (!(await validNote())) return;
+      await insertNoteStore(newNote.value);
+
+      resetForm();
     };
 
     // watch
     watch(newNote.value, () => {
-      setDisplayMessage('');
+      resetErrorMessage();
+    });
+
+    watch(errorMessage, () => {
+      setDisplayMessage(errorMessage.value, msgTypes.error);
     });
 
     // expose
