@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get('/num-of-notes', controller.getNumOfNotes);
 router.get('/edited-notes', controller.getEditedNotes);
-router.get('/done-notes', controller.getDoneNotes);
+router.get('/public-notes', controller.getPublicNotes);
 
 module.exports = router;

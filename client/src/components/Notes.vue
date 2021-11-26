@@ -1,17 +1,17 @@
 <template>
   <div class="row row-cols-1 row-cols-md-2 g-4">
-    <Note v-for="note in userNotes" :note="note" :key="note._id" />
+    <note v-for="note in userNotes" :note="note" :key="note._id"></note>
   </div>
 </template>
 
 <script>
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
 
+import { Types } from '../store/types';
 import { notes } from '../store/types/namespaces';
 
 import Note from './Note.vue';
-import { Types } from '../store/types';
 
 export default {
   name: 'Notes',

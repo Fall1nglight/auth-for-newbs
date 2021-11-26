@@ -8,6 +8,7 @@
 <script>
 import Stats from '../components/Stats.vue';
 import EditUser from '../components/EditUser.vue';
+
 export default {
   name: 'AdminDashboard',
   components: {

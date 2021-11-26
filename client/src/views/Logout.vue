@@ -3,6 +3,10 @@
 <script>
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+
+import { Types } from '../store/types';
+import { auth } from '../store/types/namespaces';
+
 export default {
   name: 'Logout',
 
@@ -11,7 +15,7 @@ export default {
     const store = useStore();
 
     //vuex
-    const logoutAction = () => store.dispatch('auth/logout');
+    const logoutAction = () => store.dispatch(`${auth}${Types.actions.LOGOUT}`);
 
     //router
     const router = useRouter();

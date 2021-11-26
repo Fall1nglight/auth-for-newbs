@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Types } from '../types';
+import { auth } from '../types/namespaces';
 import config from '../../config';
 import errorHandler from '../plugins/errorHandler';
 
@@ -27,7 +28,9 @@ const actions = {
     try {
       const { data: response } = await request.get('/users', {
         headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+          Authorization: `Bearer ${
+            rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+          }`,
         },
       });
 
@@ -48,7 +51,9 @@ const actions = {
         userToUpdate,
         {
           headers: {
-            Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+            Authorization: `Bearer ${
+              rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+            }`,
           },
         }
       );

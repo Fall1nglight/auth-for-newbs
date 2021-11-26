@@ -1,11 +1,9 @@
 <template>
   <div class="col">
-    <div
-      :class="[
-        'card h-100 border-0 border-start border-3',
-        note.reminder ? 'border-success' : 'border-danger',
-      ]"
-    >
+    <div class="card h-100 border-0 border-start border-3 border-success">
+      <div class="card-header">
+        <small class="tex">Created by {{ note.createdBy }}</small>
+      </div>
       <div class="card-body">
         <h5 class="card-title mb-3">{{ note.title }}</h5>
         <p class="card-text">{{ note.note }}</p>

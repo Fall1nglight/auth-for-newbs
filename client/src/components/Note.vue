@@ -3,12 +3,13 @@
     <div
       :class="[
         'card h-100 border-0 border-start border-3',
-        note.reminder ? 'border-success' : 'border-danger',
+        note.public ? 'border-success' : 'border-danger',
       ]"
     >
+      <!-- add hover texts -->
       <div class="card-header">
         <div class="d-flex justify-content-end" id="controls">
-          <a @click="updateReminder(note)"
+          <a @click="updatePublicState(note)"
             ><i class="bi bi-check2-circle text-success"></i
           ></a>
 
@@ -70,13 +71,14 @@
 </template>
 
 <script>
-import { computed, ref, watch } from '@vue/runtime-core';
+import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
+
+import { Types } from '../store/types';
+import { notes } from '../store/types/namespaces';
 
 import useFormatDate from '../composables/useFormatDate';
 import useDisplayMessage from '../composables/useDisplayMessage';
-import { notes } from '../store/types/namespaces';
-import { Types } from '../store/types';
 
 export default {
   name: 'Note',
@@ -121,11 +123,11 @@ export default {
       if (errorMessage.value) setErrorMessage('');
     };
 
-    const updateReminder = async ({ _id: id, reminder }) => {
+    const updatePublicState = async ({ _id: id, public: pub }) => {
       try {
         resetErrorMessage();
 
-        await editNoteAction({ id, reminder: !reminder });
+        await editNoteAction({ id, public: !pub });
       } catch (error) {
         setErrorMessage(error.message);
       }
@@ -163,7 +165,7 @@ export default {
       newNote,
       editState,
       formatDate,
-      updateReminder,
+      updatePublicState,
       editNote,
       deleteNote,
     };

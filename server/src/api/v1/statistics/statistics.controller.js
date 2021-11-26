@@ -11,14 +11,11 @@ const getEditedNotes = async (req, res, next) => {
   }
 };
 
-const getDoneNotes = async (req, res, next) => {
+const getPublicNotes = async (req, res, next) => {
   try {
-    const numOfMarkedDone = await statistics.findOne({
-      name: 'numOfMarkedDone',
-    });
+    const publicNotes = await notes.find({ public: true });
 
-    // towo | rewrite logic for updated notes
-    res.json(numOfMarkedDone);
+    res.json({ publicNotes: publicNotes.length });
   } catch (error) {
     respondWithError(res, next, error);
   }
@@ -37,5 +34,5 @@ const getNumOfNotes = async (req, res, next) => {
 module.exports = {
   getNumOfNotes,
   getEditedNotes,
-  getDoneNotes,
+  getPublicNotes,
 };

@@ -9,8 +9,9 @@
 </template>
 
 <script>
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
+
 import { Types } from '../store/types';
 import { pub } from '../store/types/namespaces';
 

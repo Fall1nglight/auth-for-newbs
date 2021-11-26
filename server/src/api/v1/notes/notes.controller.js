@@ -29,12 +29,13 @@ const post = async (req, res, next) => {
   try {
     const {
       body,
-      user: { _id: userId },
+      user: { _id: userId, username },
     } = req;
 
     const newNote = await notes.insert({
       ...body,
-      reminder: false,
+      public: false,
+      createdBy: username,
       createdAt: new Date().getTime(),
       updatedAt: 0,
       userId,
@@ -65,14 +66,7 @@ const patch = async (req, res, next) => {
 
     if (!updatedNote) throw new Error('Failed to update note. (Backend error)');
 
-    if (body.reminder) {
-      await statistics.findOneAndUpdate(
-        { name: 'numOfMarkedDone' },
-        {
-          $inc: { value: 1 },
-        }
-      );
-    } else if (body.title || body.note) {
+    if (body.title || body.note) {
       await statistics.findOneAndUpdate(
         { name: 'numOfEdited' },
         {

@@ -5,7 +5,7 @@
     </div>
 
     <div class="col-md-5">
-      <DisplayMessage :message="message" />
+      <display-message :message="message"></display-message>
 
       <div class="form-check form-switch" id="switchButton">
         <input
@@ -13,6 +13,7 @@
           type="checkbox"
           id="flexSwitchCheckDefault"
           @click="formVisibility = !formVisibility"
+          :checked="formVisibility"
         />
         <label class="form-check-label text-black" for="flexSwitchCheckDefault"
           >Toggle form</label
@@ -30,6 +31,7 @@
               id="inputTitle"
               placeholder="Enter the title of your note."
               aria-placeholder="Enter the title of your note."
+              required
             />
           </div>
 
@@ -42,6 +44,7 @@
               placeholder="Enter your note."
               aria-placeholder="Enter your note."
               rows="3"
+              required
             ></textarea>
           </div>
 
@@ -53,20 +56,21 @@
     </div>
   </div>
 
-  <Notes />
+  <notes></notes>
 </template>
 
 <script>
-import { computed, ref, watch } from '@vue/runtime-core';
+import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
+
+import { Types } from '../store/types';
+import { notes } from '../store/types/namespaces';
 
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
 import Notes from '../components/Notes.vue';
-import { notes } from '../store/types/namespaces';
-import { Types } from '../store/types';
 
 export default {
   name: 'Dashboard',
@@ -94,7 +98,7 @@ export default {
       store.dispatch(`${notes}${Types.actions.INSERT_NOTE}`, payload);
 
     const setErrorMessage = (message) =>
-      store.commit(`${notes}${Types.mutations.SET_ERROR_MESSAGE}`);
+      store.commit(`${notes}${Types.mutations.SET_ERROR_MESSAGE}`, message);
 
     // refs | local state
     const newNote = ref({

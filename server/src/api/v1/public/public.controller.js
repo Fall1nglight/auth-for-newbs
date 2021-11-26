@@ -3,7 +3,7 @@ const { respondWithError } = require('../../../helpers');
 
 const getNotes = async (req, res, next) => {
   try {
-    const publicNotes = await notes.find({ reminder: true });
+    const publicNotes = await notes.find({ public: true });
 
     res.json({ publicNotes });
   } catch (error) {

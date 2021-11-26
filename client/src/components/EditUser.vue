@@ -49,12 +49,12 @@
           <label for="inputPassword" class="form-label">Updated Password</label>
           <input
             v-model="user.password"
-            type="text"
+            type="password"
             class="form-control"
             id="inputPassword"
             placeholder="Enter the updated password."
             aria-placeholder="Enter the updated password."
-            autocomplete="off"
+            autocomplete="new-password"
           />
         </div>
 
@@ -138,14 +138,16 @@
 </template>
 
 <script>
-import { ref, computed } from '@vue/reactivity';
+import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
+
+import { Types } from '../store/types';
+import { admin } from '../store/types/namespaces';
 
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 
 import DisplayMessage from '../components/DisplayMessage.vue';
-import { watch } from '@vue/runtime-core';
 
 export default {
   name: 'EditUser',
@@ -164,10 +166,17 @@ export default {
     const store = useStore();
 
     // vuex
-    const users = computed(() => store.getters['admin/users']);
+    const users = computed(
+      () => store.getters[`${admin}${Types.getters.GET_USERS}`]
+    );
+
     const getUserByName = (username) =>
-      computed(() => store.getters['admin/userByName'](username));
-    const updateUser = (payload) => store.dispatch('admin/updateUser', payload);
+      computed(() =>
+        store.getters[`${admin}${Types.getters.GET_USER_BY_NAME}`](username)
+      );
+
+    const updateUser = (payload) =>
+      store.dispatch(`${admin}${Types.actions.UPDATE_USER}`, payload);
 
     // refs
     const user = ref({

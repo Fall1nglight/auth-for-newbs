@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Types } from '../types';
+import { auth } from '../types/namespaces';
 import config from '../../config';
 import errorHandler from '../plugins/errorHandler';
 
@@ -24,7 +25,9 @@ const actions = {
     try {
       const { data: response } = await request.get('/notes', {
         headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+          Authorization: `Bearer ${
+            rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+          }`,
         },
       });
 
@@ -38,7 +41,9 @@ const actions = {
     try {
       const { data: response } = await request.post('/notes', note, {
         headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+          Authorization: `Bearer ${
+            rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+          }`,
         },
       });
 
@@ -58,7 +63,9 @@ const actions = {
         { ...note },
         {
           headers: {
-            Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+            Authorization: `Bearer ${
+              rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+            }`,
           },
         }
       );
@@ -73,7 +80,9 @@ const actions = {
     try {
       const { data: response } = await request.delete(`/notes/${id}`, {
         headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+          Authorization: `Bearer ${
+            rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+          }`,
         },
       });
 

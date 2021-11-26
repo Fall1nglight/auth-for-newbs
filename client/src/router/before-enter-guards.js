@@ -1,11 +1,10 @@
-import store from '../store';
+import { computed } from 'vue';
 
-import { computed } from '@vue/reactivity';
+import store from '../store';
+import storeFns from './store-functions';
 
 import { Types } from '../store/types';
 import { auth } from '../store/types/namespaces';
-
-import storeFns from './store-functions';
 
 const authToken = computed(
   () => store.getters[`${auth}${Types.getters.GET_AUTHTOKEN}`]

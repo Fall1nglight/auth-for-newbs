@@ -6,10 +6,6 @@ import admin from './modules/admin';
 import statistics from './modules/statistics';
 import pub from './modules/public';
 
-// todo
-// use vuex mutation types
-// use vuex removeNamespace method
-
 export default createStore({
   state: {},
   mutations: {},

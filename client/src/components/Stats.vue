@@ -3,15 +3,19 @@
     <stat :icon="'people-fill'" :value="numOfUsers">Total Users</stat>
     <stat :icon="'card-text'" :value="numOfNotes">Total Notes</stat>
     <stat :icon="'pencil-square'" :value="numOfEditedNotes">Total Edits</stat>
-    <stat :icon="'card-checklist'" :value="numOfMarkedDoneNotes"
-      >Marked Done</stat
+    <stat :icon="'card-checklist'" :value="numOfPublicNotes"
+      >Total Public Notes</stat
     >
   </div>
 </template>
 
 <script>
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { useStore } from 'vuex';
+
+import { Types } from '../store/types';
+import { admin, statistics } from '../store/types/namespaces';
+
 import Stat from './Stat.vue';
 
 export default {
@@ -25,13 +29,22 @@ export default {
     const store = useStore();
 
     // vuex
-    const numOfUsers = computed(() => store.getters['admin/numOfUsers']);
-    const numOfNotes = computed(() => store.getters['statistics/numOfNotes']);
-    const numOfEditedNotes = computed(
-      () => store.getters['statistics/numOfEditedNotes']
+    const numOfUsers = computed(
+      () => store.getters[`${admin}${Types.getters.GET_NUM_OF_USERS}`]
     );
-    const numOfMarkedDoneNotes = computed(
-      () => store.getters['statistics/numOfMarkedDoneNotes']
+
+    const numOfNotes = computed(
+      () => store.getters[`${statistics}${Types.getters.GET_NUM_OF_NOTES}`]
+    );
+
+    const numOfEditedNotes = computed(
+      () =>
+        store.getters[`${statistics}${Types.getters.GET_NUM_OF_EDITED_NOTES}`]
+    );
+
+    const numOfPublicNotes = computed(
+      () =>
+        store.getters[`${statistics}${Types.getters.GET_NUM_OF_PUBLIC_NOTES}`]
     );
 
     // expose
@@ -39,7 +52,7 @@ export default {
       numOfUsers,
       numOfNotes,
       numOfEditedNotes,
-      numOfMarkedDoneNotes,
+      numOfPublicNotes,
     };
   },
 };

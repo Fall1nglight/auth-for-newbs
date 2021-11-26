@@ -1,14 +1,12 @@
 <template>
-  <Navbar />
+  <navbar></navbar>
 
   <div class="container pt-5">
-    <router-view />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import { provide } from '@vue/runtime-core';
-
 import Navbar from './components/Navbar.vue';
 import Footer from './components/Footer.vue';
 

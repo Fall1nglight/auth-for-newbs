@@ -4,7 +4,6 @@ const statistics = db.get('statistics');
 
 const statisticsTypes = {
   edit: 'numOfEdited',
-  done: 'numOfMarkedDone',
 };
 
 const createStatistics = async () => {
@@ -20,18 +19,8 @@ const createStatistics = async () => {
 
     await statistics.insert({ name: statisticsTypes.edit, value: 0 });
 
-    const doneCounter = await statistics.findOne({
-      name: statisticsTypes.done,
-    });
-    if (doneCounter)
-      throw new Error(
-        `'${statisticsTypes.done}' already exist in the database.`
-      );
-
-    await statistics.insert({ name: statisticsTypes.done, value: 0 });
-
     console.log(
-      `Sucessfully created '${statisticsTypes.edit}' and '${statisticsTypes.done}' objects in the database`
+      `Sucessfully created '${statisticsTypes.edit}' in the database!`
     );
   } catch (error) {
     console.error(error);

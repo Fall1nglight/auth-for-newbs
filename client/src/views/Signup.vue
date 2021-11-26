@@ -4,7 +4,7 @@
 
     <div class="row justify-content-md-center">
       <div class="col-md-10 col-lg-6">
-        <DisplayMessage :message="message" />
+        <display-message :message="message"></display-message>
       </div>
     </div>
 
@@ -68,13 +68,14 @@
 </template>
 
 <script>
-import { watch, ref, computed } from '@vue/runtime-core';
+import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { passwordStrength } from 'check-password-strength';
 
 import { Types } from '../store/types';
 import { auth } from '../store/types/namespaces';
+
 import useDisplayMessage from '../composables/useDisplayMessage';
 import schemas from '../config/schemas';
 

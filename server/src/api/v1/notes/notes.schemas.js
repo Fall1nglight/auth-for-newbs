@@ -8,9 +8,9 @@ const insert = Joi.object({
 const update = Joi.object({
   title: Joi.string().min(2).max(30),
   note: Joi.string().min(2).max(450),
-  reminder: Joi.boolean(),
+  public: Joi.boolean(),
 })
-  .or('title', 'note', 'reminder')
+  .or('title', 'note', 'public')
   .required();
 
 module.exports = {

@@ -68,9 +68,10 @@
 </template>
 
 <script>
-import { computed, ref, watch } from '@vue/runtime-core';
+import { ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
+
 import { Types } from '../store/types';
 import { auth } from '../store/types/namespaces';
 

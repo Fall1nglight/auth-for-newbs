@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Types } from '../types';
+import { auth } from '../types/namespaces';
 import config from '../../config';
 import errorHandler from '../plugins/errorHandler';
 
@@ -12,15 +13,14 @@ const request = axios.create({
 const state = {
   numOfNotes: 0,
   numOfEditedNotes: 0,
-  numOfMarkedDoneNotes: 0,
+  numOfPublicNotes: 0,
   errorMessage: '',
 };
 
 const getters = {
   [Types.getters.GET_NUM_OF_NOTES]: (state) => state.numOfNotes,
   [Types.getters.GET_NUM_OF_EDITED_NOTES]: (state) => state.numOfEditedNotes,
-  [Types.getters.GET_NUM_OF_MARKED_DONE_NOTES]: (state) =>
-    state.numOfMarkedDoneNotes,
+  [Types.getters.GET_NUM_OF_PUBLIC_NOTES]: (state) => state.numOfPublicNotes,
   [Types.getters.GET_ERROR_MESSAGE]: (state) => state.errorMessage,
 };
 
@@ -29,7 +29,9 @@ const actions = {
     try {
       const { data: response } = await request.get('/statistics/num-of-notes', {
         headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+          Authorization: `Bearer ${
+            rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+          }`,
         },
       });
 
@@ -43,25 +45,30 @@ const actions = {
     try {
       const { data: response } = await request.get('/statistics/edited-notes', {
         headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+          Authorization: `Bearer ${
+            rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+          }`,
         },
       });
 
       commit(Types.mutations.SET_NUM_OF_EDITED_NOTES, response.value);
     } catch (error) {
+      console.log(error);
       errorHandler(error, commit);
     }
   },
 
-  [Types.actions.FETCH_MARKED_DONE_NOTES]: async ({ commit, rootGetters }) => {
+  [Types.actions.FETCH_PUBLIC_NOTES]: async ({ commit, rootGetters }) => {
     try {
-      const { data: response } = await request.get('/statistics/done-notes', {
+      const { data: response } = await request.get('/statistics/public-notes', {
         headers: {
-          Authorization: `Bearer ${rootGetters['auth/authToken']}`,
+          Authorization: `Bearer ${
+            rootGetters[auth + Types.getters.GET_AUTHTOKEN]
+          }`,
         },
       });
 
-      commit(Types.mutations.SET_NUM_OF_MARKED_DONE_NOTES, response.value);
+      commit(Types.mutations.SET_NUM_OF_PUBLIC_NOTES, response.publicNotes);
     } catch (error) {
       errorHandler(error, commit);
     }
@@ -73,8 +80,8 @@ const mutations = {
     (state.numOfNotes = numOfNotes),
   [Types.mutations.SET_NUM_OF_EDITED_NOTES]: (state, value) =>
     (state.numOfEditedNotes = value),
-  [Types.mutations.SET_NUM_OF_MARKED_DONE_NOTES]: (state, value) =>
-    (state.numOfMarkedDoneNotes = value),
+  [Types.mutations.SET_NUM_OF_PUBLIC_NOTES]: (state, value) =>
+    (state.numOfPublicNotes = value),
   [Types.mutations.SET_ERROR_MESSAGE]: (state, message) =>
     (state.errorMessage = message),
 };

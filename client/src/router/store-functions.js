@@ -14,7 +14,7 @@ const fetchAllUsers = () =>
 const fetchStatistics = () => {
   store.dispatch(`${statistics}${Types.actions.FETCH_NUM_OF_NOTES}`);
   store.dispatch(`${statistics}${Types.actions.FETCH_EDITED_NOTES}`);
-  store.dispatch(`${statistics}${Types.actions.FETCH_MARKED_DONE_NOTES}`);
+  store.dispatch(`${statistics}${Types.actions.FETCH_PUBLIC_NOTES}`);
 };
 
 export default {
