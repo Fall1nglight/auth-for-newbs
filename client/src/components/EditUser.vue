@@ -170,6 +170,10 @@ export default {
       () => store.getters[`${admin}${Types.getters.GET_USERS}`]
     );
 
+    const adminErrorMessage = computed(
+      () => store.getters[`${admin}${Types.getters.GET_ERROR_MESSAGE}`]
+    );
+
     const getUserByName = (username) =>
       computed(() =>
         store.getters[`${admin}${Types.getters.GET_USER_BY_NAME}`](username)
@@ -244,6 +248,8 @@ export default {
       await updateUser({ modifiedUser, id });
 
       searchInput.value = '';
+
+      if (adminErrorMessage.value) return;
 
       setDisplayMessage(
         'User has been successfully updated!',

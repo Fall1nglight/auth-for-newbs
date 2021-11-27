@@ -6,6 +6,10 @@
       :key="note._id"
     ></public-note>
   </div>
+
+  <div class="h1 text-center mt-5" v-if="!publicNotes.length">
+    Whoops, there are not any public notes here...
+  </div>
 </template>
 
 <script>

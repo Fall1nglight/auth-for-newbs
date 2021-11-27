@@ -3,9 +3,7 @@
     <stat :icon="'people-fill'" :value="numOfUsers">Total Users</stat>
     <stat :icon="'card-text'" :value="numOfNotes">Total Notes</stat>
     <stat :icon="'pencil-square'" :value="numOfEditedNotes">Total Edits</stat>
-    <stat :icon="'card-checklist'" :value="numOfPublicNotes"
-      >Total Public Notes</stat
-    >
+    <stat :icon="'card-checklist'" :value="numOfPublicNotes">Public Notes</stat>
   </div>
 </template>
 

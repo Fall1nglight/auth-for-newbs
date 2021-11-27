@@ -9,15 +9,17 @@
       <!-- add hover texts -->
       <div class="card-header">
         <div class="d-flex justify-content-end" id="controls">
-          <a @click="updatePublicState(note)"
+          <a
+            @click="updatePublicState(note)"
+            title="Set note to public or private"
             ><i class="bi bi-check2-circle text-success"></i
           ></a>
 
-          <a @click="editState = !editState" class="mx-3"
+          <a @click="editState = !editState" class="mx-3" title="Edit note"
             ><i class="bi bi-wrench text-warning"></i
           ></a>
 
-          <a @click="deleteNote(note._id)"
+          <a @click="deleteNote(note._id)" title="Delete note"
             ><i class="bi bi-x-lg text-danger"></i
           ></a>
         </div>

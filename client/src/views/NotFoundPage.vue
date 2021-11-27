@@ -1,11 +1,10 @@
 <template>
-  <h1>Not Found - 404</h1>
+  <div class="mt-3">
+    <img src="../assets/004.jpg" alt="Not Found" class="img-fluid rounded" />
+  </div>
 </template>
 
 <script>
-// TODO: Valami kép, jobb design
-// TODO: App.vue-ba egy navbarStatusés footbarStatus, hogy ki lehessen kapcsolni -> Fullscreen
-
 export default {
   name: 'NotFoundPage',
 };

@@ -2,6 +2,10 @@
   <div class="row row-cols-1 row-cols-md-2 g-4">
     <note v-for="note in userNotes" :note="note" :key="note._id"></note>
   </div>
+
+  <div class="h1 text-center mt-5" v-if="!userNotes.length">
+    Whoops, there are not any notes here...
+  </div>
 </template>
 
 <script>
