@@ -2,26 +2,20 @@ const db = require('../db/connection');
 
 const statistics = db.get('statistics');
 
-const statisticsTypes = {
-  edit: 'numOfEdited',
-};
+const docName = 'numOfEdited';
 
 const createStatistics = async () => {
   try {
     const editCounter = await statistics.findOne({
-      name: statisticsTypes.edit,
+      name: docName,
     });
 
     if (editCounter)
-      throw new Error(
-        `'${statisticsTypes.edit}' already exist in the database.`
-      );
+      throw new Error(`'${docName}' already exists in the database!`);
 
-    await statistics.insert({ name: statisticsTypes.edit, value: 0 });
+    await statistics.insert({ name: docName, value: 0 });
 
-    console.log(
-      `Sucessfully created '${statisticsTypes.edit}' in the database!`
-    );
+    console.log(`Sucessfully created '${docName}' in the database!`);
   } catch (error) {
     console.error(error);
   } finally {

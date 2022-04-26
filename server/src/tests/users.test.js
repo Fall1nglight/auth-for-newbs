@@ -1,11 +1,8 @@
 const request = require('supertest');
-const bcrypt = require('bcryptjs');
 const { expect } = require('chai');
 
 const app = require('../app');
-const db = require('../db/connection');
-
-const users = db.get('users');
+const helpers = require('../test-utilities/helpers');
 
 let token;
 let userId;
@@ -14,7 +11,7 @@ const loginRoute = '/auth/login';
 const usersRoute = '/api/v1/users';
 
 const adminUser = {
-  username: 'testAdmin',
+  username: 'testAdmin01',
   password: 'passwordpassword',
 };
 
@@ -23,30 +20,9 @@ const newUser = {
   password: '0123456789',
 };
 
-// create admin user
-const createAdminUser = async () => {
-  try {
-    const hashedPassword = await bcrypt.hash(adminUser.password, 12);
-
-    const insertedAdminUser = await users.insert({
-      ...adminUser,
-      password: hashedPassword,
-      role: 'admin',
-      active: true,
-      createdAt: new Date().getTime(),
-      updatedAt: 0,
-    });
-
-    if (!insertedAdminUser)
-      throw new Error('Failed to create test admin user.');
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 describe(`POST ${loginRoute}`, () => {
   it('should login as admin user', async () => {
-    await createAdminUser();
+    await helpers.createAdminUser(adminUser.username, adminUser.password);
 
     const response = await request(app)
       .post(loginRoute)

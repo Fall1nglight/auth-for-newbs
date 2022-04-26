@@ -7,10 +7,6 @@ import statistics from './modules/statistics';
 import pub from './modules/public';
 
 export default createStore({
-  state: {},
-  mutations: {},
-  actions: {},
-
   modules: {
     auth,
     notes,

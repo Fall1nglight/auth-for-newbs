@@ -2,33 +2,27 @@ const request = require('supertest');
 const { expect } = require('chai');
 
 const app = require('../app');
-const db = require('../db/connection');
+const helpers = require('../test-utilities/helpers');
 
-const users = db.get('users');
+const {
+  routes: { auth },
+} = require('../test-utilities/config');
 
 let token;
-
-const signupRoute = '/auth/signup';
-const loginRoute = '/auth/login';
-const checkUserRoute = '/auth/checkuser';
 
 const newUser = {
   username: 'testUser01',
   password: '0123456789',
 };
 
-describe(`POST ${signupRoute}`, () => {
+describe(`POST ${auth.signup}`, () => {
   before(async () => {
-    try {
-      await users.remove({});
-    } catch (error) {
-      console.error(error);
-    }
+    await helpers.clearDb();
   });
 
   it('should require a username', async () => {
     const response = await request(app)
-      .post(signupRoute)
+      .post(auth.signup)
       .send({ password: newUser.password })
       .expect(422);
 
@@ -37,7 +31,7 @@ describe(`POST ${signupRoute}`, () => {
 
   it('should require a password', async () => {
     const response = await request(app)
-      .post(signupRoute)
+      .post(auth.signup)
       .send({ username: newUser.username })
       .expect(422);
 
@@ -46,7 +40,7 @@ describe(`POST ${signupRoute}`, () => {
 
   it('should create a new user', async () => {
     const response = await request(app)
-      .post(signupRoute)
+      .post(auth.signup)
       .send(newUser)
       .expect(200);
 
@@ -55,7 +49,7 @@ describe(`POST ${signupRoute}`, () => {
 
   it('should not allow a user with an existing username', async () => {
     const response = await request(app)
-      .post(signupRoute)
+      .post(auth.signup)
       .send(newUser)
       .expect(409);
 
@@ -65,10 +59,10 @@ describe(`POST ${signupRoute}`, () => {
   });
 });
 
-describe(`POST ${loginRoute}`, () => {
+describe(`POST ${auth.login}`, () => {
   it('should require a username', async () => {
     const response = await request(app)
-      .post(loginRoute)
+      .post(auth.login)
       .send({ password: newUser.password })
       .expect(422);
 
@@ -77,7 +71,7 @@ describe(`POST ${loginRoute}`, () => {
 
   it('should require a password', async () => {
     const response = await request(app)
-      .post(loginRoute)
+      .post(auth.login)
       .send({ username: newUser.username })
       .expect(422);
 
@@ -86,7 +80,7 @@ describe(`POST ${loginRoute}`, () => {
 
   it('should only allow valid users to login', async () => {
     const response = await request(app)
-      .post(loginRoute)
+      .post(auth.login)
       .send({ ...newUser, password: 'wrongPassword123' })
       .expect(422);
 
@@ -97,7 +91,7 @@ describe(`POST ${loginRoute}`, () => {
 
   it('should only allow valid users to login', async () => {
     const response = await request(app)
-      .post(loginRoute)
+      .post(auth.login)
       .send(newUser)
       .expect(200);
 
@@ -109,6 +103,7 @@ describe(`POST ${loginRoute}`, () => {
 describe(`GET ${checkUserRoute}`, () => {
   it('should validate the Authorization header', async () => {
     const response = await request(app).get(checkUserRoute).expect(200);
+
     // eslint-disable-next-line no-unused-expressions
     expect(response.body).to.be.empty;
   });

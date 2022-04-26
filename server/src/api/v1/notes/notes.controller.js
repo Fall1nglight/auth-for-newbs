@@ -41,7 +41,7 @@ const post = async (req, res, next) => {
       userId,
     });
 
-    if (!newNote) throw new Error('Failed to insert node. (Backend error)');
+    if (!newNote) throw new Error('Failed to insert note. (Backend error)');
 
     res.json({ newNote });
   } catch (error) {

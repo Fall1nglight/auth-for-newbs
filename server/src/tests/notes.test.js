@@ -77,7 +77,7 @@ describe(`POST ${notesRoute}`, () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body).to.have.property('success', true);
+    expect(response.body).to.have.property('newNote');
   });
 });
 
@@ -109,7 +109,7 @@ describe(`PATCH ${notesRoute}`, () => {
     expect(response.body.message).to.equal('Un-Authorized request');
   });
 
-  it('should require title / note / reminder', async () => {
+  it('should require title / note / public', async () => {
     const response = await request(app)
       .patch(`${notesRoute}/${noteId}`)
       .send({})
@@ -117,38 +117,38 @@ describe(`PATCH ${notesRoute}`, () => {
       .expect(422);
 
     expect(response.body.message).to.equal(
-      '"value" must contain at least one of [title, note, reminder]'
+      '"value" must contain at least one of [title, note, public]'
     );
   });
 
-  it('should update title', async () => {
+  it('should update title public', async () => {
     const response = await request(app)
       .patch(`${notesRoute}/${noteId}`)
       .send({ ...newNote, title: 'Updated title' })
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body).to.have.property('success', true);
+    expect(response.body).to.have.property('updatedNote');
   });
 
-  it('should update note (property)', async () => {
+  it('should update note property', async () => {
     const response = await request(app)
       .patch(`${notesRoute}/${noteId}`)
       .send({ ...newNote, note: 'Update note content' })
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body).to.have.property('success', true);
+    expect(response.body).to.have.property('updatedNote');
   });
 
-  it('should update reminder', async () => {
+  it('should update public property', async () => {
     const response = await request(app)
       .patch(`${notesRoute}/${noteId}`)
-      .send({ ...newNote, reminder: true })
+      .send({ ...newNote, public: true })
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    expect(response.body).to.have.property('success', true);
+    expect(response.body).to.have.property('updatedNote');
   });
 });
 

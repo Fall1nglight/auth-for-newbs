@@ -16,7 +16,8 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
-    beforeEnter: [storeFns.fetchPublicNotes],
+    // ? rate limiter error
+    beforeEnter: [storeFns.checkUser, storeFns.fetchPublicNotes],
   },
   {
     path: '/signup',
@@ -41,7 +42,6 @@ const routes = [
     name: 'AdminDashbiard',
     component: AdminDashboard,
     beforeEnter: [
-      guards.checkLogin,
       guards.checkLogin,
       storeFns.fetchAllUsers,
       storeFns.fetchStatistics,

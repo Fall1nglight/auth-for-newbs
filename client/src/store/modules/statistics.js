@@ -5,6 +5,9 @@ import { auth } from '../types/namespaces';
 import config from '../../config';
 import errorHandler from '../plugins/errorHandler';
 
+// todo
+// check before commits
+
 const request = axios.create({
   baseURL: `${config.api.url}`,
   timeout: 5000,
@@ -51,7 +54,7 @@ const actions = {
         },
       });
 
-      commit(Types.mutations.SET_NUM_OF_EDITED_NOTES, response.value);
+      commit(Types.mutations.SET_NUM_OF_EDITED_NOTES, response.numOfEdited);
     } catch (error) {
       console.log(error);
       errorHandler(error, commit);
@@ -68,7 +71,10 @@ const actions = {
         },
       });
 
-      commit(Types.mutations.SET_NUM_OF_PUBLIC_NOTES, response.publicNotes);
+      commit(
+        Types.mutations.SET_NUM_OF_PUBLIC_NOTES,
+        response.numOfPublicNotes
+      );
     } catch (error) {
       errorHandler(error, commit);
     }

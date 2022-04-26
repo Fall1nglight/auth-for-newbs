@@ -7,16 +7,14 @@ import { Types } from '../store/types';
 import { auth } from '../store/types/namespaces';
 
 const authToken = computed(
-  () => store.getters[`${auth}${Types.getters.GET_AUTHTOKEN}`]
+  () => store.getters[auth + Types.getters.GET_AUTHTOKEN]
 );
 
 const isLoggedIn = computed(
-  () => store.getters[`${auth}${Types.getters.IS_LOGGED_IN}`]
+  () => store.getters[auth + Types.getters.IS_LOGGED_IN]
 );
 
-const isAdmin = computed(
-  () => store.getters[`${auth}${Types.getters.IS_ADMIN}`]
-);
+const isAdmin = computed(() => store.getters[auth + Types.getters.IS_ADMIN]);
 
 const checkLogin = async (to, from, next) => {
   if (!authToken.value) return next({ path: '/login' });

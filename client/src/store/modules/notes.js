@@ -99,7 +99,7 @@ const mutations = {
   [Types.mutations.EDIT_NOTE]: (state, newNote) => {
     state.notes = state.notes.map((note) =>
       // if the requested note is found, update it else return the original note
-      note._id === newNote._id ? { ...state.note, ...newNote } : note
+      note._id === newNote._id ? newNote : note
     );
   },
   [Types.mutations.DELETE_NOTE]: (state, id) => {

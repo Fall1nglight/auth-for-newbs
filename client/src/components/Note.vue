@@ -108,7 +108,7 @@ export default {
       store.dispatch(`${notes}${Types.actions.DELETE_NOTE}`, id);
 
     const setErrorMessage = (message) =>
-      store.commit(`${notes}${Types.mutations.SET_ERROR_MESSAGE}`);
+      store.commit(`${notes}${Types.mutations.SET_ERROR_MESSAGE}`, message);
 
     // refs | local state
     const newNote = ref({

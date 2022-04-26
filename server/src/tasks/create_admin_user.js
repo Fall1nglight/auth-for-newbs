@@ -6,8 +6,13 @@ const users = db.get('users');
 
 const createAdminUser = async () => {
   try {
-    const adminUser = await users.findOne({ role: 'admin' });
-    if (adminUser) throw new Error('Admin user already exists.');
+    const adminUsers = await users.find({ role: 'admin' });
+    if (adminUsers.length)
+      throw new Error(
+        `Admin ${adminUsers.length > 1 ? 'users' : 'user'} already ${
+          adminUsers.length > 1 ? 'exist.' : 'exists.'
+        }`
+      );
 
     const {
       DEFAULT_ADMIN_USERNAME: defaultUsername,
@@ -15,7 +20,9 @@ const createAdminUser = async () => {
     } = process.env;
 
     if (!defaultUsername || !defaultPassword)
-      throw new Error('Missing variables, please check your .env file!');
+      throw new Error(
+        'Missing default configuration variables, please check your .env file!'
+      );
 
     const hashedPassword = await bcrypt.hash(defaultPassword, 12);
 
@@ -31,9 +38,8 @@ const createAdminUser = async () => {
     if (!insertedUser)
       throw new Error('Failed to inser admin user. Please try again later');
 
-    // eslint-disable-next-line no-console
     console.log(
-      `Admin user successfully inserted | ${defaultUsername} @ ${defaultPassword}`
+      `Admin user successfully inserted => ${defaultUsername} @ ${defaultPassword}`
     );
   } catch (error) {
     console.error(error.message);
